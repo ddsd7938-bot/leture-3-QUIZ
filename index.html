@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>صيدلي القلب | Cardio Pharm Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0b1020; --bg2:#1a0f2e; --card:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.12);
+    --red:#ff4d6d; --green:#2ee6a6; --cyan:#22d3ee; --yellow:#ffd166; --text:#eef2ff; --muted:#9aa4c7;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;}
+  body{
+    font-family:'Tajawal','Inter',system-ui,sans-serif;color:var(--text);
+    background: radial-gradient(1200px 600px at 80% -10%, #3a1450 0%, transparent 60%),
+                radial-gradient(900px 500px at 0% 110%, #0b3a4a 0%, transparent 60%),
+                linear-gradient(160deg,var(--bg1),var(--bg2));
+    background-attachment:fixed;
+  }
+  #app{max-width:860px;margin:0 auto;padding:14px 14px 40px;display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:20px;backdrop-filter:blur(10px);padding:16px;position:relative}
+  .hidden{display:none!important}
+
+  /* HUD */
+  #hud{display:flex;gap:8px;align-items:stretch;justify-content:space-between;flex-wrap:wrap}
+  .stat{flex:1;min-width:80px;background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:8px 10px;text-align:center}
+  .stat small{display:block;color:var(--muted);font-size:12px}
+  .stat b{font-size:20px;font-weight:800}
+  #lives{font-size:20px;letter-spacing:2px}
+  .heart-lost{filter:grayscale(1);opacity:.3}
+  .soundbtn{flex:0 0 auto;min-width:48px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;color:var(--text)}
+
+  /* ECG */
+  #ecgWrap{padding:10px 12px;overflow:hidden}
+  #ecgTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:14px}
+  #bpm{font-family:'Inter',monospace;font-weight:700;font-size:26px;color:var(--green)}
+  #bpm small{font-size:12px;color:var(--muted);margin-inline-start:4px}
+  #status{font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(46,230,166,.15);color:var(--green);font-size:13px;transition:.3s}
+  #status.warn{background:rgba(255,209,102,.15);color:var(--yellow)}
+  #status.bad{background:rgba(255,77,109,.18);color:var(--red)}
+  canvas{width:100%;height:110px;display:block;border-radius:10px;
+    background:linear-gradient(#06101a,#06101a);
+    background-image:linear-gradient(rgba(34,211,238,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.07) 1px,transparent 1px);
+    background-size:20px 20px}
+
+  /* Start */
+  h1{margin:0;font-size:clamp(28px,6vw,44px);font-weight:800;line-height:1.2}
+  h1 span{background:linear-gradient(90deg,var(--red),var(--yellow));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin:8px 0 14px;line-height:1.8}
+  .beat{display:inline-block;animation:beat 1s infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}}
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:12px 0}
+  .rule{background:rgba(255,255,255,.05);border-radius:12px;padding:10px;font-size:14px;line-height:1.6}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 16px}
+  .chip{border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:var(--text);padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;transition:.2s}
+  .chip:hover{transform:translateY(-2px)}
+  .chip.active{background:linear-gradient(135deg,var(--red),#c9184a);border-color:transparent;font-weight:700;box-shadow:0 6px 20px rgba(255,77,109,.35)}
+  .btn{font-family:inherit;border:0;cursor:pointer;color:#fff;font-weight:800;font-size:18px;padding:14px 26px;border-radius:14px;background:linear-gradient(135deg,var(--red),#c9184a);box-shadow:0 8px 24px rgba(255,77,109,.35);transition:.2s}
+  .btn:hover{transform:translateY(-2px) scale(1.02)}
+  .btn:active{transform:scale(.97)}
+  .btn.alt{background:linear-gradient(135deg,#2563eb,#22d3ee);box-shadow:0 8px 24px rgba(34,211,238,.25)}
+  .btn.ghost{background:rgba(255,255,255,.08);box-shadow:none;border:1px solid var(--stroke)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  /* Question */
+  #timerBar{height:8px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin-bottom:12px}
+  #timerFill{height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));background-size:300% 100%;border-radius:99px;transition:width .1s linear}
+  #qMeta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px}
+  #qCat{background:rgba(34,211,238,.12);color:var(--cyan);padding:2px 10px;border-radius:99px;font-weight:700}
+  #qText{direction:ltr;text-align:left;font-family:'Inter',sans-serif;font-size:clamp(17px,3.6vw,22px);font-weight:600;line-height:1.5;margin:6px 0 14px}
+  #opts{display:grid;gap:10px}
+  .opt{direction:ltr;text-align:left;font-family:'Inter',sans-serif;font-size:16px;color:var(--text);background:rgba(255,255,255,.06);border:1.5px solid var(--stroke);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:.18s;line-height:1.4}
+  .opt:hover:not(:disabled){background:rgba(255,255,255,.12);transform:translateX(4px)}
+  .opt .k{flex:0 0 30px;height:30px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .opt.correct{background:rgba(46,230,166,.18);border-color:var(--green)}
+  .opt.correct .k{background:var(--green);color:#022}
+  .opt.wrong{background:rgba(255,77,109,.18);border-color:var(--red)}
+  .opt.wrong .k{background:var(--red)}
+  .opt.gone{opacity:.2;pointer-events:none;text-decoration:line-through}
+  .opt:disabled{cursor:default}
+  #lifelines{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .ll{font-family:inherit;background:rgba(255,255,255,.07);border:1px solid var(--stroke);color:var(--text);border-radius:12px;padding:8px 12px;cursor:pointer;font-size:14px;font-weight:600}
+  .ll:disabled{opacity:.35;cursor:not-allowed}
+  #explain{margin-top:14px;padding:12px 14px;border-radius:14px;line-height:1.8;font-size:15px;background:rgba(34,211,238,.08);border:1px dashed rgba(34,211,238,.4)}
+  #explain .ttl{font-weight:800;margin-bottom:2px}
+  #nextRow{margin-top:12px;display:flex;justify-content:flex-start}
+
+  .shake{animation:shake .45s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}
+  .pulseG{animation:pg .5s}
+  @keyframes pg{0%{box-shadow:0 0 0 0 rgba(46,230,166,.6)}100%{box-shadow:0 0 0 24px rgba(46,230,166,0)}}
+  .float{position:absolute;font-weight:800;font-size:26px;pointer-events:none;animation:fl 1.1s forwards;z-index:5;left:50%;top:40%}
+  @keyframes fl{0%{opacity:1;transform:translate(-50%,0) scale(.8)}100%{opacity:0;transform:translate(-50%,-90px) scale(1.4)}}
+
+  /* End */
+  #endTitle{font-size:clamp(24px,5vw,34px);font-weight:800;margin:0 0 4px}
+  .bigscore{font-family:'Inter',sans-serif;font-size:56px;font-weight:800;color:var(--yellow);margin:6px 0}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:12px 0}
+  .grid4 div{background:rgba(255,255,255,.06);border-radius:12px;padding:10px;text-align:center}
+  .grid4 b{display:block;font-size:22px;font-family:'Inter',sans-serif}
+  .grid4 small{color:var(--muted)}
+  #review{margin-top:14px;display:grid;gap:10px}
+  .rv{background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.3);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.7}
+  .rv .q{direction:ltr;text-align:left;font-family:'Inter',sans-serif;font-weight:600}
+  .rv .a{direction:ltr;text-align:left;font-family:'Inter',sans-serif;color:var(--green)}
+  .rank{font-size:20px;font-weight:800;color:var(--cyan)}
+  footer{text-align:center;color:var(--muted);font-size:12px}
+  @media(max-width:520px){.card{padding:13px}.opt{font-size:15px;padding:11px 12px}.stat b{font-size:17px}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="stat"><small>النقاط</small><b id="score">0</b></div>
+    <div class="stat"><small>الأرواح</small><b id="lives"></b></div>
+    <div class="stat"><small>🔥 سلسلة</small><b id="streak">0</b></div>
+    <div class="stat"><small>السؤال</small><b id="qcount">1/10</b></div>
+    <button class="stat soundbtn" id="muteBtn" title="الصوت">🔊</button>
+  </div>
+
+  <!-- ECG -->
+  <div id="ecgWrap" class="card">
+    <div id="ecgTop">
+      <div>❤️ مراقب المريض</div>
+      <div id="bpm">72<small>BPM</small></div>
+      <div id="status">مستقر</div>
+    </div>
+    <canvas id="ecg"></canvas>
+  </div>
+
+  <!-- Start -->
+  <section id="start" class="card">
+    <h1><span class="beat">❤️</span> <span>صيدلي القلب</span><br><small style="font-size:.5em;font-family:Inter;color:var(--muted);font-weight:600">Cardio Pharm Quest</small></h1>
+    <p class="sub">أنقذ المريض بمعلوماتك عن أدوية القلب! أجب على أسئلة MCQ عن <b>Antihypertensive, Heart Failure, Antiarrhythmic, Antianginal & Diuretics</b>. كل إجابة خاطئة تُتعب قلب المريض… وإذا نفدت أرواحك يتوقف القلب 💔</p>
+    <div class="rules">
+      <div class="rule">⏱️ لديك 20 ثانية لكل سؤال. السرعة تعطيك نقاط أكثر.</div>
+      <div class="rule">🔥 السلسلة المتتالية تزيد المكافأة، وكل 5 إجابات صحيحة تستعيد روحاً.</div>
+      <div class="rule">🛟 مساعدات: حذف إجابتين (50/50) و +10 ثواني.</div>
+      <div class="rule">⌨️ اختصارات: أرقام 1-4 للاختيار، Enter للتالي.</div>
+    </div>
+    <b>اختر الموضوع:</b>
+    <div class="chips" id="chips"></div>
+    <div class="row">
+      <button class="btn" id="startBtn">ابدأ العلاج 🩺</button>
+      <span class="sub" style="margin:0">أفضل نتيجة: <b id="best" style="color:var(--yellow)">0</b></span>
+    </div>
+  </section>
+
+  <!-- Game -->
+  <section id="game" class="card hidden">
+    <div id="timerBar"><div id="timerFill"></div></div>
+    <div id="qMeta"><span id="qCat"></span><span id="timeTxt">20s</span></div>
+    <div id="qText"></div>
+    <div id="opts"></div>
+    <div id="lifelines">
+      <button class="ll" id="llFifty">✂️ 50/50 (<span id="fiftyN">2</span>)</button>
+      <button class="ll" id="llTime">⏳ +10 ثواني (<span id="timeN">1</span>)</button>
+    </div>
+    <div id="explain" class="hidden"></div>
+    <div id="nextRow" class="hidden"><button class="btn alt" id="nextBtn">التالي ◀</button></div>
+  </section>
+
+  <!-- End -->
+  <section id="end" class="card hidden">
+    <h2 id="endTitle"></h2>
+    <div class="rank" id="rank"></div>
+    <div class="bigscore" id="finalScore">0</div>
+    <div class="grid4">
+      <div><b id="eCorrect">0</b><small>إجابات صحيحة</small></div>
+      <div><b id="eAcc">0%</b><small>الدقة</small></div>
+      <div><b id="eStreak">0</b><small>أطول سلسلة</small></div>
+      <div><b id="eBest">0</b><small>أفضل نتيجة</small></div>
+    </div>
+    <div class="row">
+      <button class="btn" id="againBtn">العب مجدداً 🔄</button>
+      <button class="btn ghost" id="wrongBtn">راجع أخطائي كلعبة 🎯</button>
+      <button class="btn ghost" id="menuBtn">القائمة</button>
+    </div>
+    <div id="review"></div>
+  </section>
+
+  <footer>مبني على نص: Antihypertensive, Heart Failure, Antiarrhythmic & Antianginal Drugs</footer>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const CATS = {
+  all:"🎲 الكل (مختلط)",
+  htn:"🩸 ارتفاع الضغط والأصناف",
+  ace:"💊 ACE Inhibitors",
+  arb:"🛡️ ARBs",
+  ccb:"⚡ Calcium Channel Blockers",
+  diur:"💧 Diuretics",
+  hf:"🫀 Heart Failure",
+  arr:"〰️ Arrhythmia",
+  ang:"🔥 Angina (Nitrates & β-Blockers)"
+};
+const CAT_SHORT = {htn:"Hypertension",ace:"ACE Inhibitors",arb:"ARBs",ccb:"CCBs",diur:"Diuretics",hf:"Heart Failure",arr:"Arrhythmia",ang:"Angina"};
+
+// [category, question, options[], correctIndex, explanation(Arabic)]
+const Q = [
+ ["htn","Hypertension is best defined as:",["Persistently elevated arterial blood pressure","A temporary drop in heart rate","Inadequate oxygen supply to the myocardium","Abnormal heart rhythm"],0,"ارتفاع ضغط الدم هو ارتفاع مستمر في ضغط الشرايين (Persistently elevated arterial blood pressure)."],
+ ["htn","Which of the following is NOT a goal of antihypertensive treatment?",["Prevent stroke","Protect the kidneys","Increase cardiovascular complications","Prevent myocardial infarction"],2,"الهدف هو تقليل المضاعفات القلبية الوعائية وليس زيادتها: خفض الضغط، منع السكتة والجلطة، حماية الكلى."],
+ ["htn","Treatment of hypertension aims to prevent which two major events?",["Stroke and myocardial infarction","Asthma and diabetes","Anemia and infection","Gout and arthritis"],0,"من أهداف العلاج: Prevent stroke و Prevent myocardial infarction."],
+ ["htn","Which is a major class of antihypertensive drugs?",["Antihistamines","ARBs","Opioids","Antibiotics"],1,"الأصناف الرئيسية: ACE inhibitors, ARBs, CCBs, Diuretics, β-blockers وأدوية أخرى."],
+ ["htn","Which list contains ONLY major antihypertensive classes?",["ACE inhibitors, ARBs, Diuretics, β-blockers","Penicillins, ARBs, Statins, Opioids","Antacids, Diuretics, Steroids, ACE inhibitors","Antifungals, CCBs, Antivirals, ARBs"],0,"ACE inhibitors, ARBs, Calcium channel blockers, Diuretics, β-blockers, Other agents."],
+
+ ["ace","Captopril belongs to which class?",["ARBs","ACE inhibitors","Calcium channel blockers","Nitrates"],1,"Captopril و Enalapril و Lisinopril كلها ACE inhibitors (ينتهي أغلبها بـ -pril)."],
+ ["ace","Which of the following is an ACE inhibitor?",["Losartan","Amlodipine","Lisinopril","Verapamil"],2,"Lisinopril من ACE inhibitors. Losartan = ARB، Amlodipine و Verapamil = CCBs."],
+ ["ace","Enalapril is an example of:",["ACE inhibitor","β-blocker","Nitrate","Thiazide diuretic"],0,"Enalapril من أمثلة ACE inhibitors مع Captopril و Lisinopril."],
+ ["ace","ACE inhibition leads to:",["↑ Angiotensin II and ↑ Aldosterone","↓ Angiotensin II and ↓ Aldosterone","↑ Blood volume","↑ Blood pressure"],1,"ACE inhibition → ↓ Angiotensin II و ↓ Aldosterone → توسّع أوعية → ↓ حجم الدم → ↓ الضغط."],
+ ["ace","Which sequence correctly describes the effect of ACE inhibitors?",["Vasoconstriction → ↑ Blood volume → ↑ BP","↓ Angiotensin II & Aldosterone → Vasodilation → ↓ Blood volume → ↓ BP","↑ Aldosterone → Vasodilation → ↓ BP","↓ Angiotensin II → Vasoconstriction → ↓ BP"],1,"التسلسل الصحيح: ↓ Ang II و ↓ Aldosterone → Vasodilation → ↓ Blood volume → ↓ Blood pressure."],
+ ["ace","Which is a characteristic dry adverse effect of ACE inhibitors?",["Dry cough","Constipation","Hair loss","Tinnitus"],0,"السعال الجاف (Dry cough) أشهر أعراض ACE inhibitors الجانبية."],
+ ["ace","Which serious swelling reaction is an important adverse effect of ACE inhibitors?",["Angioedema","Gynecomastia","Gingivitis","Tendon rupture"],0,"Angioedema من الأعراض المهمة لـ ACE inhibitors."],
+ ["ace","ACE inhibitors may cause hyperkalemia because they:",["Increase aldosterone","Decrease aldosterone","Block calcium channels","Increase angiotensin II"],1,"انخفاض Aldosterone يعني احتباس البوتاسيوم → Hyperkalemia."],
+ ["ace","Which is NOT an important adverse effect of ACE inhibitors?",["Dry cough","Hyperkalemia","Angioedema","Hypokalemia with severe tachycardia"],3,"الأعراض المهمة: Dry cough, Hyperkalemia, Hypotension, Angioedema."],
+
+ ["arb","Losartan is classified as:",["ARB","ACE inhibitor","Loop diuretic","Nitrate"],0,"Losartan و Valsartan و Candesartan هي ARBs (تنتهي بـ -sartan)."],
+ ["arb","Which of these drugs is an ARB?",["Valsartan","Captopril","Diltiazem","Atenolol"],0,"Valsartan من ARBs."],
+ ["arb","Candesartan belongs to which group?",["Angiotensin II Receptor Blockers","Calcium channel blockers","β-blockers","Nitrates"],0,"Candesartan من ARBs."],
+ ["arb","A main advantage of ARBs over ACE inhibitors is:",["They cause less cough","They cause more cough","They are nitrates","They increase potassium excretion"],0,"ARBs عادةً تسبب سعالاً أقل من ACE inhibitors."],
+ ["arb","Which adverse effects are associated with ARBs?",["Hyperkalemia and hypotension","Hypokalemia and hypertension","Dry cough and angioedema only","Bradycardia only"],0,"أعراض ARBs: Hyperkalemia و Hypotension."],
+ ["arb","Which statement about ARBs is correct?",["They generally cause less cough than ACE inhibitors","They always cause dry cough","They are used only in angina","They are potassium-wasting diuretics"],0,"ميزة ARBs الأساسية: سعال أقل."],
+
+ ["ccb","Amlodipine is an example of:",["Calcium channel blocker","ARB","ACE inhibitor","Thiazide"],0,"Amlodipine و Nifedipine و Verapamil و Diltiazem هي Calcium channel blockers."],
+ ["ccb","Which drug is NOT a calcium channel blocker?",["Nifedipine","Verapamil","Diltiazem","Candesartan"],3,"Candesartan هو ARB وليس CCB."],
+ ["ccb","The main effect of calcium channel blockers in hypertension is:",["Vasodilation → ↓ Blood pressure","Vasoconstriction → ↑ BP","Increased aldosterone","Increased blood volume"],0,"التأثير الرئيسي: Vasodilation → ↓ Blood pressure."],
+ ["ccb","Which of these pairs are both calcium channel blockers?",["Verapamil and Diltiazem","Losartan and Valsartan","Captopril and Enalapril","Atenolol and Metoprolol"],0,"Verapamil و Diltiazem كلاهما CCBs."],
+ ["ccb","Which drug is used both in hypertension and in angina as a calcium channel blocker?",["Nifedipine","Nitroglycerin","Captopril","Valsartan"],0,"CCBs مثل Amlodipine, Nifedipine, Verapamil, Diltiazem تُستخدم في الضغط والذبحة."],
+
+ ["diur","Hydrochlorothiazide is an example of:",["Thiazide diuretic","Loop diuretic","β-blocker","ARB"],0,"Hydrochlorothiazide هو المثال الأشهر لمدرّات Thiazide."],
+ ["diur","Which list shows the important diuretic classes in hypertension?",["Thiazide, Loop, Potassium-sparing","Thiazide, Nitrate, ARB","Loop, ACE, CCB","Potassium-sparing, β-blocker, Nitrate"],0,"Thiazides, Loop diuretics, Potassium-sparing diuretics."],
+ ["diur","Diuretics are drugs that:",["Increase urinary excretion of sodium and water","Decrease urine output","Block ACE enzyme","Relax venous smooth muscle only"],0,"المدرّات تزيد إخراج الصوديوم والماء في البول."],
+ ["diur","Diuretics act mainly on:",["Different parts of the renal nephron","The brain stem","The lung alveoli","The coronary arteries"],0,"تعمل المدرّات على أجزاء مختلفة من Nephron في الكلية."],
+ ["diur","Which is NOT a diuretic class mentioned for hypertension?",["Loop diuretics","Thiazide diuretics","Potassium-sparing diuretics","Nitrate diuretics"],3,"لا يوجد صنف اسمه Nitrate diuretics."],
+
+ ["hf","Heart failure occurs when:",["The heart cannot pump enough blood to meet the body's needs","Blood pressure is persistently high","Coronary arteries are completely normal","The heart beats irregularly only"],0,"فشل القلب = عجز القلب عن ضخ دم كافٍ لحاجة الجسم."],
+ ["hf","Which is a possible symptom of heart failure?",["Dyspnea","Increased exercise tolerance","Dry cough only from ACEi","Hair growth"],0,"أعراض: Dyspnea, Fatigue, Peripheral edema, Exercise intolerance."],
+ ["hf","Which is NOT a typical symptom of heart failure?",["Fatigue","Peripheral edema","Exercise intolerance","Improved exercise capacity"],3,"فشل القلب يسبب عدم تحمل المجهود (Exercise intolerance) وليس تحسنه."],
+ ["hf","A goal of drug therapy in heart failure is to:",["Reduce hospitalizations","Increase symptoms","Increase fluid retention","Reduce survival"],0,"الأهداف: تقليل الأعراض، تقليل دخول المستشفى، تحسين البقاء حيث ينطبق."],
+ ["hf","Peripheral edema is a possible symptom of:",["Heart failure","Atrial flutter only","Stable normal circulation","Nitrate therapy"],0,"Peripheral edema من أعراض فشل القلب."],
+
+ ["arr","An arrhythmia is an abnormality in:",["Heart rate, rhythm or electrical conduction","Kidney filtration","Lung compliance","Blood glucose"],0,"Arrhythmia = خلل في المعدل أو النظم أو التوصيل الكهربائي."],
+ ["arr","Which of the following is an example of an arrhythmia?",["Atrial fibrillation","Angina pectoris","Hypertension","Peripheral edema"],0,"Atrial fibrillation مثال على Arrhythmia."],
+ ["arr","Which pair are both arrhythmias?",["Atrial flutter and Ventricular tachycardia","Angina and Hypertension","Heart failure and Angina","Dyspnea and Fatigue"],0,"Atrial flutter و Ventricular tachycardia أمثلة لاضطراب النظم."],
+ ["arr","Ventricular tachycardia is classified as:",["Arrhythmia","Angina","A diuretic class","A type of nitrate"],0,"Ventricular tachycardia = اضطراب نظم بطيني سريع."],
+
+ ["ang","Angina pectoris is chest discomfort caused by:",["Inadequate oxygen supply to myocardium relative to demand","Excess oxygen delivery to the heart","High potassium levels","Low blood volume only"],0,"الذبحة: نقص الأكسجين الواصل للعضلة القلبية مقارنةً بحاجتها."],
+ ["ang","Antianginal treatment aims to:",["↓ Myocardial O₂ demand and/or ↑ coronary blood flow","↑ Myocardial O₂ demand","↓ Coronary blood flow","↑ Heart rate only"],0,"الهدف: ↓ احتياج الأكسجين و/أو ↑ تدفق الدم التاجي."],
+ ["ang","Nitroglycerin belongs to which class?",["Nitrates","β-blockers","ARBs","Thiazides"],0,"Nitroglycerin و Isosorbide mononitrate و Isosorbide dinitrate هي Nitrates."],
+ ["ang","Which drug is a nitrate?",["Isosorbide mononitrate","Propranolol","Diltiazem","Losartan"],0,"Isosorbide mononitrate من Nitrates."],
+ ["ang","The mechanism of nitrates is:",["Smooth muscle relaxation","ACE inhibition","Sodium excretion in the nephron","Angiotensin receptor blockade"],0,"Nitrates → استرخاء العضلات الملساء."],
+ ["ang","The major effect of nitrates that reduces cardiac oxygen demand is:",["Venodilation","Venoconstriction","Increased aldosterone","Increased heart rate"],0,"Venodilation → ↓ الحمل على القلب → ↓ O₂ demand."],
+ ["ang","Metoprolol is an example of:",["β-blocker","Nitrate","ACE inhibitor","Loop diuretic"],0,"Metoprolol و Atenolol و Propranolol هي β-blockers."],
+ ["ang","Which pair are both β-blockers used in angina?",["Atenolol and Propranolol","Nifedipine and Verapamil","Captopril and Losartan","Nitroglycerin and Enalapril"],0,"Atenolol و Propranolol كلاهما β-blockers."],
+ ["ang","Which drug is NOT a nitrate?",["Nitroglycerin","Isosorbide dinitrate","Propranolol","Isosorbide mononitrate"],2,"Propranolol هو β-blocker وليس nitrate."],
+ ["ang","Which calcium channel blockers are listed for angina?",["Amlodipine, Nifedipine, Verapamil, Diltiazem","Losartan, Valsartan, Candesartan","Captopril, Enalapril, Lisinopril","Metoprolol, Atenolol, Propranolol"],0,"CCBs في الذبحة: Amlodipine, Nifedipine, Verapamil, Diltiazem."],
+ ["ang","Which class is used in BOTH hypertension and angina according to the text?",["Calcium channel blockers","Nitrates only","ARBs only","Loop diuretics only"],0,"CCBs مذكورة في علاج الضغط والذبحة (وكذلك β-blockers مذكورة في الذبحة)."]
+];
+
+/* ===================== STATE ===================== */
+const $ = id => document.getElementById(id);
+let selectedCat = "all";
+let G = null;
+const TIME_PER_Q = 20;
+const MAXQ = 15;
+let best = 0;
+try{ best = +localStorage.getItem("cpq_best")||0 }catch(e){}
+$("best").textContent = best;
+
+/* ===================== AUDIO ===================== */
+let actx=null, muted=false;
+function initAudio(){ if(!actx){ try{actx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){} } if(actx&&actx.state==="suspended")actx.resume(); }
+function tone(f,d=.15,type="sine",vol=.15,delay=0,slide=0){
+  if(!actx||muted)return;
+  const t=actx.currentTime+delay, o=actx.createOscillator(), g=actx.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),t+d);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g).connect(actx.destination);o.start(t);o.stop(t+d+.02);
+}
+const SFX={
+  click(){tone(520,.08,"triangle",.1)},
+  correct(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,"triangle",.14,i*.08))},
+  wrong(){tone(180,.35,"sawtooth",.15,0,-90);tone(140,.4,"square",.08,.1,-60)},
+  tick(){tone(900,.04,"square",.05)},
+  life(){[392,523,659,784,988].forEach((f,i)=>tone(f,.15,"sine",.13,i*.06))},
+  win(){[523,659,784,659,784,1047,1319].forEach((f,i)=>tone(f,.22,"triangle",.15,i*.12))},
+  lose(){[440,370,311,247,185].forEach((f,i)=>tone(f,.4,"sawtooth",.12,i*.25))},
+  flat(){tone(880,2.2,"sine",.08)},
+  power(){tone(700,.12,"sine",.12,0,500)}
+};
+$("muteBtn").onclick=()=>{initAudio();muted=!muted;$("muteBtn").textContent=muted?"🔇":"🔊"};
+
+/* ===================== ECG ===================== */
+const cv=$("ecg"), cx=cv.getContext("2d");
+let W=300,H=110,buf=[];
+function resizeEcg(){
+  const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  W=Math.floor(r.width);H=Math.floor(r.height);
+  cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
+  buf=new Array(W).fill(0);
+}
+window.addEventListener("resize",resizeEcg);
+const gauss=(x,m,s)=>Math.exp(-((x-m)*(x-m))/(2*s*s));
+function ecgWave(p){
+  return 0.12*gauss(p,.16,.035) - 0.14*gauss(p,.27,.008) + 1.0*gauss(p,.30,.009) - 0.28*gauss(p,.33,.01) + 0.22*gauss(p,.55,.05);
+}
+let ecgMode="normal", targetBpm=72, shownBpm=72, phase=0, chaosT=0, ecgAcc=0, lastT=performance.now(), chaosUntil=0, bpmTick=0;
+function baseBpmForLives(l){ return l>=3?72:l===2?92:l===1?118:0; }
+function setStatus(txt,cls){const s=$("status");s.textContent=txt;s.className=cls||""}
+function ecgLoop(now){
+  const dt=Math.min(.05,(now-lastT)/1000);lastT=now;
+  if(ecgMode==="chaos"&&now>chaosUntil){ecgMode="normal";refreshVitals()}
+  ecgAcc+=dt*130;
+  while(ecgAcc>=1){
+    ecgAcc--;
+    let v=0;
+    if(ecgMode==="normal"){
+      phase+=(shownBpm/60)/130; if(phase>=1)phase-=1;
+      v=ecgWave(phase)+ (Math.random()-.5)*.02;
+    }else if(ecgMode==="chaos"){
+      chaosT+=1;
+      v=.7*Math.sin(chaosT*.33)+.35*Math.sin(chaosT*.9)+(Math.random()-.5)*.5;
+    }else v=(Math.random()-.5)*.004;
+    buf.push(v);buf.shift();
+  }
+  // bpm easing
+  const tb = ecgMode==="chaos"? 150+Math.sin(now/90)*25 : targetBpm;
+  shownBpm += (tb-shownBpm)*Math.min(1,dt*3);
+  bpmTick+=dt;
+  if(bpmTick>.15){bpmTick=0;$("bpm").innerHTML=(ecgMode==="flat"?"0":Math.round(shownBpm))+"<small>BPM</small>"}
+  // draw
+  cx.clearRect(0,0,W,H);
+  const col= ecgMode==="chaos"?"#ff4d6d":ecgMode==="flat"?"#ff4d6d":"#2ee6a6";
+  cx.strokeStyle=col;cx.lineWidth=2;cx.shadowColor=col;cx.shadowBlur=8;cx.lineJoin="round";
+  cx.beginPath();
+  for(let i=0;i<W;i++){const y=H*.62-buf[i]*H*.5; i?cx.lineTo(i,y):cx.moveTo(i,y)}
+  cx.stroke();
+  cx.shadowBlur=0;
+  cx.fillStyle=col;cx.beginPath();cx.arc(W-1,H*.62-buf[W-1]*H*.5,4,0,7);cx.fill();
+  requestAnimationFrame(ecgLoop);
+}
+function refreshVitals(){
+  if(!G){targetBpm=72;ecgMode="normal";setStatus("مستقر","");return}
+  const l=G.lives;
+  if(l<=0){ecgMode="flat";targetBpm=0;setStatus("توقف القلب!","bad");return}
+  targetBpm=baseBpmForLives(l)+Math.min(G.streak,5);
+  if(l>=3)setStatus("مستقر","");
+  else if(l===2)setStatus("متعب ⚠️","warn");
+  else setStatus("حالة حرجة 🚨","bad");
+}
+function chaos(ms=1800){ecgMode="chaos";chaosUntil=performance.now()+ms;setStatus("عدم انتظام! ⚡","bad")}
+
+/* ===================== MENU ===================== */
+function buildChips(){
+  const box=$("chips");box.innerHTML="";
+  Object.entries(CATS).forEach(([k,v])=>{
+    const b=document.createElement("button");
+    b.className="chip"+(k===selectedCat?" active":"");b.textContent=v;
+    b.onclick=()=>{initAudio();SFX.click();selectedCat=k;buildChips()};
+    box.appendChild(b);
+  });
+}
+buildChips();
+
+function show(id){["start","game","end"].forEach(s=>$(s).classList.toggle("hidden",s!==id));
+  $("hud").classList.toggle("hidden",id==="start");}
+
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ===================== GAME ===================== */
+function startGame(pool){
+  initAudio();SFX.click();
+  if(!pool){
+    pool=Q.filter(q=>selectedCat==="all"||q[0]===selectedCat);
+  }
+  const chosen=shuffle(pool).slice(0,MAXQ).map(q=>{
+    const correctText=q[2][q[3]];
+    const opts=shuffle(q[2]);
+    return {cat:q[0],q:q[1],opts,ans:opts.indexOf(correctText),exp:q[4],orig:q};
+  });
+  G={queue:chosen,i:0,score:0,lives:3,streak:0,bestStreak:0,correct:0,answered:false,
+     timeLeft:TIME_PER_Q,fifty:2,plus:1,wrong:[],timer:null,total:chosen.length};
+  show("game");
+  refreshVitals();
+  loadQuestion();
+}
+function renderHud(){
+  $("score").textContent=G.score;
+  $("streak").textContent=G.streak;
+  $("qcount").textContent=Math.min(G.i+1,G.total)+"/"+G.total;
+  let h="";for(let i=0;i<3;i++)h+=`<span class="${i<G.lives?"":"heart-lost"}">❤️</span>`;
+  $("lives").innerHTML=h;
+  $("fiftyN").textContent=G.fifty;$("timeN").textContent=G.plus;
+}
+function loadQuestion(){
+  const q=G.queue[G.i];
+  G.answered=false;G.timeLeft=TIME_PER_Q;
+  $("qCat").textContent=CAT_SHORT[q.cat];
+  $("qText").textContent=q.q;
+  const box=$("opts");box.innerHTML="";
+  q.opts.forEach((t,i)=>{
+    const b=document.createElement("button");b.className="opt";b.dataset.i=i;
+    b.innerHTML=`<span class="k">${"ABCD"[i]}</span><span></span>`;
+    b.lastChild.textContent=t;
+    b.onclick=()=>answer(i);
+    box.appendChild(b);
+  });
+  $("explain").classList.add("hidden");$("nextRow").classList.add("hidden");
+  $("llFifty").disabled=G.fifty<=0;$("llTime").disabled=G.plus<=0;
+  renderHud();
+  clearInterval(G.timer);
+  updateTimer();
+  G.timer=setInterval(()=>{
+    G.timeLeft-=.1;
+    if(G.timeLeft<=0){G.timeLeft=0;updateTimer();answer(-1)}
+    else{updateTimer(); if(G.timeLeft<5 && Math.abs(G.timeLeft-Math.round(G.timeLeft))<.05)SFX.tick()}
+  },100);
+}
+function updateTimer(){
+  const pct=Math.max(0,G.timeLeft/ (TIME_PER_Q+ (G.extra||0)) *100);
+  $("timerFill").style.width=Math.min(100,pct)+"%";
+  $("timerFill").style.backgroundPosition=(100-Math.min(100,pct))+"% 0";
+  $("timeTxt").textContent=Math.ceil(G.timeLeft)+"s";
+}
+function floatText(txt,color){
+  const f=document.createElement("div");f.className="float";f.textContent=txt;f.style.color=color;
+  $("game").appendChild(f);setTimeout(()=>f.remove(),1100);
+}
+function answer(i){
+  if(!G||G.answered)return;
+  G.answered=true;clearInterval(G.timer);
+  const q=G.queue[G.i];
+  const btns=[...document.querySelectorAll(".opt")];
+  btns.forEach(b=>b.disabled=true);
+  btns[q.ans].classList.add("correct");
+  let msg="",ok=i===q.ans;
+  if(ok){
+    G.streak++;G.correct++;G.bestStreak=Math.max(G.bestStreak,G.streak);
+    const pts=100+Math.ceil(G.timeLeft)*5+Math.min(G.streak-1,5)*20;
+    G.score+=pts;
+    SFX.correct();floatText("+"+pts,"#2ee6a6");
+    $("game").classList.add("pulseG");setTimeout(()=>$("game").classList.remove("pulseG"),500);
+    msg="✅ إجابة صحيحة!";
+    if(G.streak%5===0&&G.lives<3){G.lives++;setTimeout(()=>{SFX.life();floatText("❤️ +1 روح","#ff4d6d")},500);msg+=" 🎁 مكافأة: استعدت روحاً!"}
+  }else{
+    if(i>=0)btns[i].classList.add("wrong");
+    G.streak=0;G.lives--;
+    G.wrong.push(q.orig);
+    SFX.wrong();floatText(i<0?"⏰ انتهى الوقت":"💔 -1","#ff4d6d");
+    $("game").classList.add("shake");setTimeout(()=>$("game").classList.remove("shake"),450);
+    chaos();
+    msg=i<0?"⏰ انتهى الوقت!":"❌ إجابة خاطئة!";
+  }
+  G.extra=0;
+  refreshVitals();renderHud();
+  const ex=$("explain");
+  ex.innerHTML=`<div class="ttl">${msg}</div><div>💡 ${q.exp}</div>`;
+  ex.classList.remove("hidden");
+  const last=G.i>=G.total-1||G.lives<=0;
+  $("nextBtn").textContent=last?"عرض النتيجة 🏁":"التالي ◀";
+  $("nextRow").classList.remove("hidden");
+  $("nextBtn").focus({preventScroll:true});
+  ex.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function next(){
+  if(!G||!G.answered)return;
+  SFX.click();
+  if(G.lives<=0||G.i>=G.total-1)return endGame();
+  G.i++;loadQuestion();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("nextBtn").onclick=next;
+
+/* Lifelines */
+$("llFifty").onclick=()=>{
+  if(!G||G.answered||G.fifty<=0)return;
+  initAudio();SFX.power();G.fifty--;
+  const q=G.queue[G.i];
+  const wrong=shuffle([0,1,2,3].filter(x=>x!==q.ans)).slice(0,2);
+  const btns=document.querySelectorAll(".opt");
+  wrong.forEach(x=>btns[x].classList.add("gone"));
+  $("llFifty").disabled=G.fifty<=0;renderHud();
+};
+$("llTime").onclick=()=>{
+  if(!G||G.answered||G.plus<=0)return;
+  initAudio();SFX.power();G.plus--;G.extra=(G.extra||0)+10;
+  G.timeLeft+=10;$("llTime").disabled=G.plus<=0;renderHud();
+};
+
+/* Keyboard */
+document.addEventListener("keydown",e=>{
+  if(!G||$("game").classList.contains("hidden"))return;
+  if(["1","2","3","4"].includes(e.key)&&!G.answered){
+    const b=document.querySelectorAll(".opt")[+e.key-1];
+    if(b&&!b.classList.contains("gone"))answer(+e.key-1);
+  }else if((e.key==="Enter"||e.key===" ")&&G.answered){e.preventDefault();next()}
+});
+
+/* ===================== END ===================== */
+function endGame(){
+  clearInterval(G.timer);
+  show("end");
+  const died=G.lives<=0;
+  const answered=G.i+1;
+  const acc=Math.round(G.correct/Math.max(1,answered)*100);
+  // bonus for lives left
+  if(!died)G.score+=G.lives*50;
+  if(G.score>best){best=G.score;try{localStorage.setItem("cpq_best",best)}catch(e){}}
+  $("best").textContent=best;
+  $("endTitle").textContent=died?"💔 توقف قلب المريض — Game Over":"🎉 أنقذت المريض! أحسنت!";
+  let rank;
+  if(died&&acc<50)rank="🩺 طالب تحت التدريب — راجع النص وحاول مجدداً";
+  else if(acc>=90)rank="🏆 استشاري صيدلة سريرية";
+  else if(acc>=70)rank="⭐ صيدلي إكلينيكي ماهر";
+  else if(acc>=50)rank="📘 طالب مجتهد";
+  else rank="🌱 مبتدئ واعد";
+  $("rank").textContent=rank;
+  $("finalScore").textContent=G.score;
+  $("eCorrect").textContent=G.correct+"/"+answered;
+  $("eAcc").textContent=acc+"%";
+  $("eStreak").textContent=G.bestStreak;
+  $("eBest").textContent=best;
+  $("wrongBtn").classList.toggle("hidden",G.wrong.length===0);
+  const rv=$("review");rv.innerHTML="";
+  if(G.wrong.length){
+    const h=document.createElement("h3");h.textContent="📝 مراجعة الأسئلة التي أخطأت فيها";h.style.margin="6px 0 0";rv.appendChild(h);
+    G.wrong.forEach(o=>{
+      const d=document.createElement("div");d.className="rv";
+      const q=document.createElement("div");q.className="q";q.textContent=o[1];
+      const a=document.createElement("div");a.className="a";a.textContent="✔ "+o[2][o[3]];
+      const e=document.createElement("div");e.textContent="💡 "+o[4];
+      d.append(q,a,e);rv.appendChild(d);
+    });
+  }
+  if(died){ecgMode="flat";targetBpm=0;setStatus("توقف القلب!","bad");SFX.lose();setTimeout(SFX.flat,1300)}
+  else{ecgMode="normal";targetBpm=72;setStatus("مستقر ✔","");SFX.win()}
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("startBtn").onclick=()=>startGame();
+$("againBtn").onclick=()=>{ecgMode="normal";startGame()};
+$("wrongBtn").onclick=()=>{const p=G.wrong.slice();ecgMode="normal";startGame(p)};
+$("menuBtn").onclick=()=>{SFX.click();G=null;ecgMode="normal";targetBpm=72;setStatus("مستقر","");show("start")};
+
+/* Init */
+resizeEcg();
+requestAnimationFrame(ecgLoop);
+</script>
+</body>
+</html>
