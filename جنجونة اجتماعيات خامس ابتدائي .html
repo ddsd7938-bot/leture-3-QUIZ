@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>اجتماعيات | الصف الخامس الابتدائي — رحلة لولو والدبدوب لونا</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23ff5fa2"/><path d="M50 18l9 19 21 .8-16.3 13 5.4 19.7L50 60.7 30.9 70.5l5.4-19.7-16.3-13 21-.8z" fill="%23ffd23f"/></svg>'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+/* ============ المتغيرات العامة ============ */
+:root{
+  --pink:#ff5fa2;
+  --pink-mid:#ff8fb8;
+  --pink-dark:#e8438f;
+  --pink-deep:#d6336c;
+  --pink-deep2:#b81d63;
+  --pink-soft:#ffd3e6;
+  --pink-border:#ffc4dd;
+  --pink-bg:#ffd0e2;
+  --cream:#fffdf6;
+  --gold:#ffd23f;
+  --gold-dark:#e0a92e;
+  --green:#22c55e;
+  --green-dark:#16a34a;
+  --green-bg:#dcf9e8;
+  --red:#ff5b5b;
+  --red-dark:#e03131;
+  --red-bg:#ffe1e1;
+  --text:#5f2740;
+  --plum:#4d1f3a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Cairo',sans-serif;
+  background:var(--pink-bg);
+  color:var(--text);
+  overflow:hidden;
+}
+.hidden{display:none !important}
+.screen{position:fixed;inset:0;height:100vh;height:100dvh;overflow:hidden}
+
+/* ============ كانفاس الكونفيتي ============ */
+#fx{position:fixed;inset:0;z-index:60;pointer-events:none}
+
+/* ============ زر كتم الصوت ============ */
+.mute-btn{
+  position:fixed;top:12px;left:12px;z-index:70;width:52px;height:52px;border-radius:50%;
+  border:2.5px solid var(--pink-border);background:rgba(255,255,255,.92);cursor:pointer;
+  box-shadow:0 4px 12px rgba(214,51,108,.35);display:flex;align-items:center;justify-content:center;
+  transition:transform .2s;
+}
+.mute-btn:hover{transform:scale(1.1)}
+.mute-btn svg{width:26px;height:26px}
+.mute-btn .slash{display:none}
+.mute-btn.muted .waves{display:none}
+.mute-btn.muted .slash{display:block}
+
+/* ============ طبقة الفيونكات ============ */
+.bow-layer{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.deco-bow{
+  position:absolute;opacity:0;transform:scale(0) rotate(var(--r,0deg));
+  transition:transform .55s cubic-bezier(.3,1.5,.4,1),opacity .4s ease;width:64px;
+}
+.deco-bow svg{width:100%;height:auto;display:block}
+.bows-on .deco-bow{opacity:1;transform:scale(1) rotate(var(--r,0deg))}
+.bow-float{display:block;animation:floaty 4.4s ease-in-out infinite alternate}
+@keyframes floaty{from{transform:translateY(0)}to{transform:translateY(-13px)}}
+
+/* ============ طبقات الخلفية الوردية ============ */
+.pink-world{
+  position:absolute;inset:0;z-index:0;
+  background-color:#ffd0e2;
+  background-image:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.9), transparent 55%),
+    radial-gradient(circle, rgba(255,255,255,.75) 9px, transparent 10px),
+    radial-gradient(circle, rgba(255,133,180,.38) 13px, transparent 14px);
+  background-size:100% 100%, 76px 76px, 76px 76px;
+  background-position:center, 0 0, 38px 38px;
+}
+.quiz-screen,.over-screen{z-index:10;background:transparent}
+
+/* ============ طبقة النهار (شاشة البداية) ============ */
+.day-layer{position:absolute;inset:0;z-index:1;transition:opacity 1.5s ease}
+.start-screen.pushing .day-layer{opacity:0;pointer-events:none}
+.bg-day{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#7ecbf3 0%,#aee4fb 34%,#d8f0d9 66%,#ffe7bd 100%);
+}
+.sun{
+  position:absolute;top:5%;left:6%;width:clamp(90px,15vw,148px);
+  filter:drop-shadow(0 0 26px rgba(255,220,90,.85));
+}
+.sun-rays{transform-origin:center;transform-box:fill-box;animation:spinSlow 46s linear infinite}
+@keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.cloud{position:absolute;opacity:.96;animation:cloudDrift 9s ease-in-out infinite alternate}
+.cloud-1{top:9%;left:22%;width:clamp(90px,15vw,160px);animation-delay:-2s}
+.cloud-2{top:20%;left:56%;width:clamp(70px,12vw,130px);animation-delay:-5s;animation-duration:11s}
+.cloud-3{top:6%;left:66%;width:clamp(60px,10vw,110px);animation-delay:-1s;animation-duration:13s}
+@keyframes cloudDrift{from{transform:translateX(-3vw)}to{transform:translateX(4vw)}}
+
+.hills{position:absolute;bottom:-2px;left:0;width:100%;height:clamp(120px,17vh,190px)}
+
+/* ============ محتوى شاشة البداية ============ */
+.start-content{
+  position:absolute;top:3%;left:0;right:0;z-index:5;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:clamp(4px,1vh,12px);padding:0 12px;
+}
+.badge-pill{
+  display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.9);
+  border:2px solid #fff;border-radius:999px;padding:6px 18px;
+  font-weight:800;font-size:clamp(10px,2.3vw,14px);color:#c2185b;
+  box-shadow:0 5px 14px rgba(0,60,120,.18);
+}
+.flag-svg{width:34px;height:auto;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.game-title{
+  font-family:'Lalezar';font-size:clamp(46px,11.5vw,88px);line-height:1.02;color:#ffffff;
+  text-shadow:0 4px 0 var(--pink-dark),0 9px 0 rgba(194,24,91,.4),0 20px 40px rgba(194,24,91,.5);
+}
+.chapter-chip{
+  font-family:'Cairo';font-weight:900;color:#6b3a00;
+  background:linear-gradient(180deg,#ffe27a,#ffd23f);border:2.5px solid #fff;
+  border-radius:14px;padding:4px 18px;font-size:clamp(11px,2.5vw,16px);
+  box-shadow:0 5px 12px rgba(224,169,46,.45);
+}
+.game-sub{
+  color:#4d1f3a;font-weight:800;font-size:clamp(12px,2.6vw,17px);
+  background:rgba(255,255,255,.68);border-radius:999px;padding:4px 20px;
+  border:2px solid rgba(255,255,255,.9);
+}
+.feature-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{
+  display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.78);
+  border:2px solid #fff;border-radius:999px;padding:4px 14px;
+  font-size:clamp(10px,2vw,13px);font-weight:800;color:#8a2c54;
+}
+.chip svg{width:16px;height:16px}
+
+.start-btn{
+  margin-top:2px;font-family:'Lalezar';font-size:clamp(21px,4.6vw,31px);color:#5f3800;
+  background:linear-gradient(180deg,#ffe27a 0%,#ffd23f 45%,#ffb703 100%);
+  border:3px solid #fff;border-radius:999px;padding:14px 52px;cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 6px 0 #cf8a0b,0 14px 34px rgba(207,138,11,.45);
+  transition:transform .18s ease;animation:btnPulse 2.2s ease-in-out infinite;
+}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 6px 0 #cf8a0b,0 12px 30px rgba(207,138,11,.4)}
+  50%{box-shadow:0 6px 0 #cf8a0b,0 12px 46px rgba(255,215,90,.85)}
+}
+.start-btn:hover{transform:translateY(-3px) scale(1.03)}
+.start-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #cf8a0b}
+.start-btn svg{width:clamp(24px,4vw,32px);height:auto}
+.best-pill{
+  font-size:clamp(10px,2.1vw,13px);color:#8a2c54;font-weight:800;
+  background:rgba(255,255,255,.72);padding:4px 18px;border-radius:999px;border:2px solid #fff;
+}
+
+/* ============ مشهد الدفع السفلي ============ */
+.scene-bottom{position:absolute;bottom:0;left:0;right:0;height:46%;z-index:4;pointer-events:none}
+.push-group{
+  position:absolute;bottom:8%;right:3%;display:flex;align-items:flex-end;direction:ltr;
+  z-index:4;transition:transform 1.75s cubic-bezier(.55,-.18,.35,1.05);
+}
+.start-screen.pushing .push-group{transform:translateX(-170vw)}
+
+.girl-spot{width:clamp(132px,22.5vw,212px);margin-left:-30px;margin-bottom:4px;z-index:2}
+.girl-spot svg{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 8px rgba(90,30,60,.25))}
+.girl-svg .girl-all{animation:girlBob 1.7s ease-in-out infinite}
+.start-screen.pushing .girl-svg .girl-all{animation:girlBob .38s ease-in-out infinite}
+@keyframes girlBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-1.4deg)}}
+.girl-svg.jump .girl-all{animation:cheerJump .62s ease}
+@keyframes cheerJump{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-28px) scale(1.05,.95)}70%{transform:translateY(3px) scale(.96,1.04)}}
+
+.teddy-spot{
+  position:absolute;bottom:9%;left:4%;width:clamp(118px,19vw,178px);z-index:3;
+  transform:rotate(-2deg);
+}
+.teddy-spot svg{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 8px rgba(90,30,60,.25))}
+.teddy-svg .teddy-all{animation:teddyBob 2.3s ease-in-out infinite}
+@keyframes teddyBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(1.4deg)}}
+.teddy-svg.jump .teddy-all{animation:cheerJump .62s ease}
+.horn-tongue{transform-origin:12px 0px;transform:scaleX(.2);transition:transform .4s cubic-bezier(.25,1.9,.4,1)}
+.teddy-svg.blow .horn-tongue{transform:scaleX(1)}
+
+/* اللوحة الكبيرة */
+.big-sign{display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.sign-board{
+  position:relative;background:linear-gradient(180deg,#fffdf2 0%,#ffefd2 100%);
+  border:6px solid var(--pink);outline:4px solid #fff;border-radius:24px;
+  padding:16px 14px 12px;text-align:center;width:clamp(186px,31vw,296px);
+  box-shadow:0 14px 32px rgba(194,24,91,.3),inset 0 2px 0 #fff;
+}
+.sign-badge{
+  position:absolute;top:-17px;right:-16px;background:var(--pink-deep);color:#fff;
+  font-family:'Lalezar';font-size:clamp(10px,2vw,13px);padding:4px 13px;border-radius:999px;
+  border:2px solid #fff;box-shadow:0 4px 8px rgba(214,51,108,.4);white-space:nowrap;transform:rotate(4deg);
+}
+.sign-book{width:clamp(30px,5.5vw,44px);height:auto;margin:0 auto 2px}
+.sign-title{
+  font-family:'Lalezar';font-size:clamp(30px,6.4vw,48px);line-height:1.05;
+  color:var(--pink-deep);text-shadow:2.5px 2.5px 0 #ffd0e4;
+}
+.sign-sub{
+  display:inline-block;margin-top:6px;background:#ffe3ee;border:2px solid #ffb3d2;
+  color:#8a3a5e;font-weight:900;font-size:clamp(10px,2.3vw,15px);
+  border-radius:999px;padding:3px 12px;white-space:nowrap;
+}
+.sign-legs{display:flex;justify-content:space-between;width:100%;padding:0 36px}
+.leg{width:17px;height:32px;background:#b06a3b;border:3px solid #7d4a22;border-top:none;border-radius:0 0 6px 6px}
+.wheels{display:flex;justify-content:space-between;width:100%;padding:0 24px;margin-top:-3px}
+.wheel{width:clamp(30px,5.6vw,42px);height:auto}
+.wheel .spokes{transform-origin:center;transform-box:fill-box}
+.start-screen.pushing .wheel .spokes{animation:spinWheel .45s linear infinite}
+@keyframes spinWheel{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* فقاعات الكلام */
+.speech{
+  position:absolute;background:#fff;border:2.5px solid #ffb3d2;color:#a33a66;
+  font-weight:800;font-size:clamp(10px,2vw,13.5px);border-radius:16px;
+  padding:7px 13px;box-shadow:0 6px 14px rgba(214,51,108,.28);
+  white-space:nowrap;transition:opacity .4s;z-index:5;animation:popIn .7s .4s backwards;
+}
+.speech::after{
+  content:'';position:absolute;bottom:-9px;right:32px;width:13px;height:13px;
+  background:#fff;border-left:2.5px solid #ffb3d2;border-bottom:2.5px solid #ffb3d2;
+  transform:rotate(-45deg);
+}
+.speech.teddy-b::after{right:auto;left:32px;transform:rotate(-45deg)}
+.girl-bubble{right:23%;bottom:82%}
+.teddy-bubble{left:3%;bottom:70%}
+.start-screen.pushing .speech{opacity:0}
+
+/* ============ البنرات / الجيرلاند ============ */
+.bunting{position:absolute;top:0;left:0;width:100%;height:clamp(48px,8vh,80px);z-index:3;pointer-events:none}
+
+/* ============ شاشة الأسئلة ============ */
+.quiz-wrap{
+  position:relative;z-index:4;height:100%;display:flex;flex-direction:column;
+  max-width:1020px;margin:0 auto;padding-top:clamp(46px,8vh,64px);
+}
+.topbar{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:6px 14px 0;position:relative;z-index:5;
+}
+.pill{
+  background:rgba(255,255,255,.93);border:2px solid var(--pink-border);border-radius:999px;
+  box-shadow:0 4px 14px rgba(214,51,108,.28);display:flex;align-items:center;
+  gap:8px;padding:7px 16px;backdrop-filter:blur(4px);
+}
+.stat-pill{
+  font-family:'Lalezar';font-size:clamp(17px,3.4vw,23px);color:var(--pink-deep2);
+  min-width:clamp(70px,12vw,96px);justify-content:center;
+}
+.stat-pill.bump{animation:bumpPill .42s ease}
+@keyframes bumpPill{0%{transform:scale(1)}40%{transform:scale(1.35) rotate(-3deg)}100%{transform:scale(1)}}
+.stat-pill svg{width:clamp(19px,3.6vw,25px);height:auto}
+
+.progress-box{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.progress-label{text-align:center;font-weight:800;color:#8a2c54;font-size:clamp(10px,2.1vw,13.5px)}
+.progress-label b{color:var(--pink-deep2);font-family:'Lalezar'}
+.progress-track{
+  direction:ltr;height:15px;background:rgba(255,255,255,.8);border:2px solid var(--pink-border);
+  border-radius:999px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;width:0%;border-radius:999px;position:relative;overflow:hidden;
+  background:linear-gradient(90deg,#ff9ec4,#ff5fa2 55%,#e8438f);transition:width .45s ease;
+}
+.progress-fill::after{
+  content:'';position:absolute;top:0;bottom:0;left:0;width:60px;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);
+  animation:shineMove 1.7s ease-in-out infinite;
+}
+@keyframes shineMove{from{transform:translateX(-80px)}to{transform:translateX(660px)}}
+
+.hearts-pill{gap:4px;min-width:auto;padding:7px 13px}
+.heart-svg{width:clamp(19px,4.4vw,25px);height:auto}
+.heart-svg .heart-path{fill:#ff4d6d;stroke:#d6336c;stroke-width:1.6;transition:fill .3s,stroke .3s}
+.heart-svg.lost .heart-path{fill:#e9d9df;stroke:#c9b0ba}
+.heart-svg.lost{animation:heartLost .65s ease}
+@keyframes heartLost{0%{transform:scale(1)}30%{transform:scale(1.6) rotate(-16deg)}60%{transform:scale(.75) rotate(12deg)}100%{transform:scale(1)}}
+
+/* المسرح: بنت + بطاقة + دبدوب */
+.stage{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:0 10px;margin-top:clamp(6px,2vh,18px);position:relative;z-index:4;
+}
+.side-char{flex:0 1 auto;width:clamp(78px,16vw,158px);filter:drop-shadow(0 9px 12px rgba(150,30,80,.32))}
+.side-char svg{width:100%;height:auto;display:block}
+
+.question-card{
+  position:relative;flex:1 1 auto;max-width:620px;min-height:clamp(130px,22vh,178px);
+  background:linear-gradient(180deg,#ffffff,#fff3f9);border:4px solid #ffc0da;border-radius:26px;
+  box-shadow:0 14px 34px rgba(190,40,105,.3),inset 0 2px 0 #fff;
+  padding:30px 20px 13px;display:flex;flex-direction:column;justify-content:center;text-align:center;
+}
+.question-card.pop{animation:cardPop .45s cubic-bezier(.3,1.5,.4,1)}
+@keyframes cardPop{0%{transform:scale(.86);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1)}}
+.question-card.shake{animation:shakeX .55s ease}
+@keyframes shakeX{0%,100%{transform:translateX(0)}18%{transform:translateX(-13px)}38%{transform:translateX(12px)}58%{transform:translateX(-9px)}78%{transform:translateX(6px)}}
+
+.card-bow{position:absolute;width:clamp(34px,6vw,52px);z-index:2}
+.card-bow-r{top:-18px;right:-14px;transform:rotate(18deg)}
+.card-bow-l{bottom:-16px;left:-12px;transform:rotate(-160deg)}
+
+.q-ribbon{
+  position:absolute;top:-17px;right:50%;transform:translateX(50%);
+  background:linear-gradient(180deg,#ff6fae,#e8438f);color:#fff;font-family:'Lalezar';
+  font-size:clamp(12px,2.4vw,16px);padding:5px 20px;border-radius:999px;
+  display:flex;align-items:center;gap:8px;border:2.5px solid #fff;
+  box-shadow:0 5px 12px rgba(232,67,143,.5);white-space:nowrap;
+}
+.q-ribbon svg{width:17px;height:17px}
+.q-text{
+  font-weight:800;font-size:clamp(15px,3vw,21.5px);color:var(--plum);
+  line-height:1.75;min-height:3.1em;display:flex;align-items:center;justify-content:center;
+}
+.timer-track{
+  direction:ltr;height:10px;background:#ffe0ec;border:1.5px solid var(--pink-border);
+  border-radius:999px;overflow:hidden;margin-top:11px;
+}
+.timer-fill{height:100%;width:100%;background:linear-gradient(90deg,#ffd23f,#ff9f43);transition:width .05s linear}
+.timer-fill.low{background:linear-gradient(90deg,#ff8a5b,#ff4040);animation:lowPulse .4s infinite alternate}
+@keyframes lowPulse{from{filter:brightness(1)}to{filter:brightness(1.4)}}
+
+/* خيارات الإجابة */
+.options-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:11px;
+  width:100%;max-width:740px;margin:11px auto 0;padding:0 14px;position:relative;z-index:4;
+}
+.option-btn{
+  display:flex;align-items:center;gap:11px;background:var(--cream);
+  border:3px solid #ffc9de;border-radius:20px;padding:10px 13px;cursor:pointer;
+  font-family:'Cairo';font-weight:800;font-size:clamp(13px,2.5vw,17px);color:#5b2745;
+  text-align:right;box-shadow:0 5px 0 #f4c0d4,0 10px 18px rgba(214,51,108,.16);
+  transition:transform .16s,box-shadow .16s,border-color .16s,background .16s,opacity .3s;
+}
+.option-btn:hover:not(.disabled){transform:translateY(-3px);border-color:#ff8fb8;box-shadow:0 8px 0 #f4c0d4,0 15px 26px rgba(214,51,108,.3)}
+.option-btn:active:not(.disabled){transform:translateY(2px);box-shadow:0 2px 0 #f4c0d4}
+.opt-letter{
+  flex:0 0 auto;width:clamp(38px,6vw,46px);height:clamp(38px,6vw,46px);border-radius:50%;
+  background:linear-gradient(180deg,#ff8fb8,#e8438f);color:#fff;font-family:'Lalezar';
+  font-size:clamp(18px,3.4vw,23px);display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 2px 4px rgba(0,0,0,.15);
+}
+.opt-text{flex:1;line-height:1.5}
+.opt-state{flex:0 0 auto;width:clamp(24px,4.6vw,32px);height:clamp(24px,4.6vw,32px)}
+.opt-state svg{width:100%;height:100%;display:none}
+.option-btn.correct{background:var(--green-bg);border-color:var(--green);box-shadow:0 5px 0 #b3e7c9,0 10px 20px rgba(34,197,94,.3)}
+.option-btn.correct .opt-letter{background:linear-gradient(180deg,#3ddc84,#16a34a)}
+.option-btn.correct .icon-check{display:block;animation:popIn .45s cubic-bezier(.3,1.6,.4,1)}
+.option-btn.wrong{background:var(--red-bg);border-color:var(--red);box-shadow:0 5px 0 #f4b8b8;animation:shakeX .5s ease}
+.option-btn.wrong .opt-letter{background:linear-gradient(180deg,#ff8a8a,#e03131)}
+.option-btn.wrong .icon-cross{display:block;animation:popIn .45s}
+.option-btn.disabled{pointer-events:none}
+.option-btn.hint-out{opacity:.16;transform:scale(.95);pointer-events:none}
+@keyframes popIn{0%{opacity:0;transform:scale(.5)}60%{transform:scale(1.28)}100%{opacity:1;transform:scale(1)}}
+
+/* صف التلميح والكومبو */
+.hint-row{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:12px;position:relative;z-index:4;padding:0 12px 12px;flex-wrap:wrap}
+.hint-btn{
+  display:flex;align-items:center;gap:9px;background:#fff;border:2.5px solid var(--gold);
+  color:#8a5200;font-family:'Cairo';font-weight:900;font-size:clamp(12px,2.4vw,15.5px);
+  padding:8px 20px;border-radius:999px;cursor:pointer;box-shadow:0 4px 0 #ecd48e;transition:transform .15s;
+}
+.hint-btn:hover:not(:disabled){transform:translateY(-2px)}
+.hint-btn:disabled{opacity:.5;cursor:default}
+.hint-btn svg{width:20px;height:20px}
+.hint-count{
+  background:var(--gold);border-radius:50%;width:25px;height:25px;display:flex;
+  align-items:center;justify-content:center;font-size:13px;color:#5f3800;font-family:'Lalezar';
+}
+.combo-pill{
+  display:none;align-items:center;gap:8px;background:linear-gradient(180deg,#ffb703,#fb8500);
+  color:#fff;font-family:'Lalezar';padding:8px 20px;border-radius:999px;
+  border:2.5px solid #fff;box-shadow:0 5px 16px rgba(251,133,0,.5);font-size:clamp(13px,2.5vw,17px);
+}
+.combo-pill.show{display:flex;animation:popIn .35s}
+.combo-pill svg{width:19px;height:19px}
+
+/* بانر التغذية الراجعة */
+.feedback-banner{
+  position:absolute;top:clamp(58px,10vh,84px);left:50%;transform:translate(-50%,-26px) scale(.75);
+  opacity:0;z-index:30;pointer-events:none;display:flex;align-items:center;gap:12px;
+  padding:11px 28px;border-radius:999px;font-family:'Lalezar';
+  font-size:clamp(15px,3.4vw,22px);color:#fff;border:3px solid #fff;
+  box-shadow:0 12px 28px rgba(0,0,0,.22);max-width:94vw;text-align:center;
+  transition:all .32s cubic-bezier(.3,1.5,.4,1);
+}
+.feedback-banner.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.feedback-banner.good{background:linear-gradient(180deg,#34d399,#16a34a)}
+.feedback-banner.bad{background:linear-gradient(180deg,#ff8a5b,#e03131)}
+.gain-tag{
+  background:#fff;color:#16a34a;border-radius:999px;padding:1px 12px;
+  font-size:.82em;display:none;
+}
+
+/* ============ شاشة النهاية ============ */
+.over-screen{display:flex;align-items:center;justify-content:center;padding:14px;z-index:10}
+.over-card{
+  position:relative;background:linear-gradient(180deg,#ffffff,#fff0f7);
+  border:4px solid #ffc0da;border-radius:32px;box-shadow:0 24px 54px rgba(150,20,80,.4);
+  max-width:480px;width:100%;padding:74px 24px 22px;text-align:center;z-index:5;
+  animation:popIn .6s cubic-bezier(.3,1.5,.4,1);max-height:96vh;max-height:96dvh;overflow-y:auto;
+}
+.over-trophy{
+  position:absolute;top:-56px;left:50%;transform:translateX(-50%);
+  width:clamp(96px,22vw,124px);filter:drop-shadow(0 10px 14px rgba(180,120,0,.4));
+}
+.corner-char{position:absolute;top:-24px;width:clamp(64px,16vw,86px);z-index:6;animation:cheerJump 1.15s ease-in-out infinite}
+.corner-girl{right:-12px;transform:rotate(9deg);animation-delay:.15s}
+.corner-teddy{left:-12px;transform:rotate(-9deg)}
+.corner-char svg{width:100%;height:auto;display:block}
+
+.over-title{font-family:'Lalezar';font-size:clamp(22px,5.4vw,32px);color:var(--pink-deep);line-height:1.25;margin-bottom:4px}
+.over-msg{font-weight:700;color:#7a3a58;font-size:clamp(12px,2.6vw,15.5px);line-height:1.8;margin-bottom:10px}
+.stars-row{display:flex;justify-content:center;gap:10px;margin:4px 0 12px}
+.over-star svg{width:clamp(50px,13vw,66px);height:auto}
+.over-star .star-fill{fill:#ecdde3;stroke:#c9aeb9;stroke-width:1.3;transition:fill .3s,stroke .3s}
+.over-star.filled .star-fill{fill:var(--gold);stroke:var(--gold-dark)}
+.over-star.filled{animation:starPop .6s cubic-bezier(.3,1.7,.4,1)}
+@keyframes starPop{0%{transform:scale(0) rotate(-45deg);opacity:0}60%{transform:scale(1.65) rotate(10deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+
+.over-stats{background:#ffeef6;border:2px dashed #f3a4c8;border-radius:18px;padding:8px 14px;margin-bottom:14px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 4px;font-weight:800;color:#6d2b4c;font-size:clamp(12px,2.6vw,15px)}
+.stat-row + .stat-row{border-top:1.5px dashed #f3b8d2}
+.stat-label{display:flex;align-items:center;gap:9px}
+.stat-label svg{width:19px;height:19px}
+.stat-row .val{font-family:'Lalezar';color:var(--pink-deep2);font-size:1.18em}
+
+.over-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{
+  font-family:'Lalezar';border:none;cursor:pointer;border-radius:999px;
+  padding:12px 26px;font-size:clamp(15px,3.5vw,19px);display:flex;align-items:center;
+  gap:9px;transition:transform .16s,box-shadow .16s;
+}
+.btn svg{width:21px;height:21px}
+.btn-pink{background:linear-gradient(180deg,#ff6fae,#e8438f);color:#fff;box-shadow:0 6px 0 #c2185b,0 12px 22px rgba(232,67,143,.42)}
+.btn-pink:hover{transform:translateY(-2px)}
+.btn-pink:active{transform:translateY(3px);box-shadow:0 2px 0 #c2185b}
+.btn-ghost{background:#fff;color:var(--pink-deep);border:3px solid #ffb3d2;box-shadow:0 4px 0 #f3c3d6}
+.btn-ghost:hover{transform:translateY(-2px)}
+
+/* ============ نص نقاط طافي ============ */
+.float-gain{
+  position:fixed;z-index:80;font-family:'Lalezar';color:#16a34a;font-size:26px;
+  transform:translateX(-50%);pointer-events:none;text-shadow:0 2px 0 #fff,0 4px 8px rgba(0,0,0,.15);
+  animation:floatUp 1.15s ease forwards;
+}
+@keyframes floatUp{
+  0%{opacity:0;transform:translate(-50%,12px) scale(.5)}
+  22%{opacity:1;transform:translate(-50%,-8px) scale(1.3)}
+  100%{opacity:0;transform:translate(-50%,-74px) scale(1)}
+}
+
+/* ============ تجاوب ============ */
+@media (max-width:640px){
+  .options-grid{grid-template-columns:1fr;gap:9px}
+  .side-char{width:clamp(56px,13vw,80px)}
+  .stage{padding:0 6px}
+  .question-card{padding:26px 12px 11px;min-height:118px}
+  .feature-chips{display:none}
+  .girl-bubble{right:16%;bottom:84%}
+}
+@media (max-height:620px){
+  .start-content{top:1.5%;gap:5px}
+  .game-title{font-size:40px}
+  .start-btn{padding:10px 40px;font-size:19px}
+  .scene-bottom{height:44%}
+  .game-sub{display:none}
+  .bunting{height:44px}
+  .quiz-wrap{padding-top:44px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.35s !important}
+}
+</style>
+</head>
+<body>
+
+<canvas id="fx"></canvas>
+
+<!-- زر كتم الصوت -->
+<button id="muteBtn" class="mute-btn" aria-label="تبديل الصوت">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path d="M4 9.5v5h3.8L13 19V5L7.8 9.5H4z" fill="#d6336c"/>
+    <g class="waves" stroke="#d6336c" stroke-width="2" stroke-linecap="round">
+      <path d="M16.5 9.2a4.4 4.4 0 0 1 0 5.6"/>
+      <path d="M19.2 6.8a8 8 0 0 1 0 10.4"/>
+    </g>
+    <line class="slash" x1="4" y1="4" x2="21" y2="21" stroke="#e03131" stroke-width="2.6" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<!-- ══════════════ شاشة البداية ══════════════ -->
+<section id="startScreen" class="screen start-screen">
+  <div class="pink-world"></div>
+  <div class="bow-layer" id="bowsStart"></div>
+
+  <!-- طبقة النهار -->
+  <div class="day-layer">
+    <div class="bg-day"></div>
+    <svg class="sun" viewBox="0 0 140 140" aria-hidden="true">
+      <g class="sun-rays" stroke="#ffd94d" stroke-width="7" stroke-linecap="round">
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(0 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(45 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(90 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(135 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(180 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(225 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(270 70 70)"/>
+        <line x1="70" y1="10" x2="70" y2="27" transform="rotate(315 70 70)"/>
+      </g>
+      <circle cx="70" cy="70" r="36" fill="#ffd94d" stroke="#f0b429" stroke-width="4"/>
+      <circle cx="58" cy="67" r="3.5" fill="#7a4a00"/>
+      <circle cx="82" cy="67" r="3.5" fill="#7a4a00"/>
+      <path d="M58 80 Q70 89 82 80" stroke="#7a4a00" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="51" cy="76" rx="4.5" ry="2.6" fill="#ffb066" opacity=".9"/>
+      <ellipse cx="89" cy="76" rx="4.5" ry="2.6" fill="#ffb066" opacity=".9"/>
+    </svg>
+    <svg class="cloud cloud-1" viewBox="0 0 200 110" aria-hidden="true"><g fill="#ffffff"><ellipse cx="58" cy="72" rx="46" ry="25"/><ellipse cx="108" cy="52" rx="45" ry="29"/><ellipse cx="150" cy="75" rx="40" ry="21"/><rect x="28" y="66" width="152" height="27" rx="13.5"/></g></svg>
+    <svg class="cloud cloud-2" viewBox="0 0 200 110" aria-hidden="true"><g fill="#ffffff"><ellipse cx="58" cy="72" rx="46" ry="25"/><ellipse cx="108" cy="52" rx="45" ry="29"/><ellipse cx="150" cy="75" rx="40" ry="21"/><rect x="28" y="66" width="152" height="27" rx="13.5"/></g></svg>
+    <svg class="cloud cloud-3" viewBox="0 0 200 110" aria-hidden="true"><g fill="#ffffff"><ellipse cx="58" cy="72" rx="46" ry="25"/><ellipse cx="108" cy="52" rx="45" ry="29"/><ellipse cx="150" cy="75" rx="40" ry="21"/><rect x="28" y="66" width="152" height="27" rx="13.5"/></g></svg>
+    <svg class="hills" viewBox="0 0 1440 190" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M0 96 Q 205 38 430 96 T 865 92 T 1440 100 V190 H0 Z" fill="#a9e69e"/>
+      <path d="M0 132 Q 265 84 520 128 T 1015 126 T 1440 132 V190 H0 Z" fill="#82d97c"/>
+      <g>
+        <circle cx="180" cy="152" r="4.5" fill="#fff"/><circle cx="180" cy="141" r="4.5" fill="#ffb3d2"/><circle cx="180" cy="163" r="4.5" fill="#ffb3d2"/><circle cx="169" cy="152" r="4.5" fill="#ffb3d2"/><circle cx="191" cy="152" r="4.5" fill="#ffb3d2"/><circle cx="180" cy="152" r="3.4" fill="#ffd23f"/>
+        <circle cx="432" cy="164" r="4.5" fill="#fff"/><circle cx="432" cy="153" r="4.5" fill="#c58bff"/><circle cx="432" cy="175" r="4.5" fill="#c58bff"/><circle cx="421" cy="164" r="4.5" fill="#c58bff"/><circle cx="443" cy="164" r="4.5" fill="#c58bff"/><circle cx="432" cy="164" r="3.4" fill="#ffd23f"/>
+        <circle cx="705" cy="150" r="4.5" fill="#fff"/><circle cx="705" cy="139" r="4.5" fill="#ff8fb8"/><circle cx="705" cy="161" r="4.5" fill="#ff8fb8"/><circle cx="694" cy="150" r="4.5" fill="#ff8fb8"/><circle cx="716" cy="150" r="4.5" fill="#ff8fb8"/><circle cx="705" cy="150" r="3.4" fill="#ffd23f"/>
+        <circle cx="1025" cy="160" r="4.5" fill="#fff"/><circle cx="1025" cy="149" r="4.5" fill="#7be0ad"/><circle cx="1025" cy="171" r="4.5" fill="#7be0ad"/><circle cx="1014" cy="160" r="4.5" fill="#7be0ad"/><circle cx="1036" cy="160" r="4.5" fill="#7be0ad"/><circle cx="1025" cy="160" r="3.4" fill="#ffd23f"/>
+        <circle cx="1295" cy="150" r="4.5" fill="#fff"/><circle cx="1295" cy="139" r="4.5" fill="#ffb3d2"/><circle cx="1295" cy="161" r="4.5" fill="#ffb3d2"/><circle cx="1284" cy="150" r="4.5" fill="#ffb3d2"/><circle cx="1306" cy="150" r="4.5" fill="#ffb3d2"/><circle cx="1295" cy="150" r="3.4" fill="#ffd23f"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- المحتوى العلوي -->
+  <div class="start-content">
+    <div class="badge-pill">
+      <svg class="flag-svg" viewBox="0 0 60 40" aria-hidden="true">
+        <rect width="60" height="40" rx="5" fill="#ffffff"/>
+        <rect width="60" height="13.4" rx="5" fill="#ce1126"/>
+        <rect y="13.4" width="60" height="13.3" fill="#ffffff"/>
+        <rect y="26.7" width="60" height="13.3" rx="5" fill="#141414"/>
+        <text x="30" y="24.4" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#007a3d" font-family="Cairo">الله أكبر</text>
+      </svg>
+      وزارة التربية — الصف الخامس الابتدائي
+    </div>
+    <h1 class="game-title">اجتماعيات</h1>
+    <div class="chapter-chip">الفصل الأول: موقع وطننا العراق</div>
+    <div class="game-sub">رحلة ممتعة مع لولو والدبدوب لونا — درسنا: موقع العراق وأهميته ومحافظاته</div>
+    <div class="feature-chips">
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="#e8438f" stroke-width="2.4" stroke-linecap="round"/></svg>أسئلة اختيار من متعدد</span>
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#e8438f" stroke-width="2.4"/><path d="M9.5 12.2l2 2 3.6-4.4" stroke="#e8438f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>12 سؤالاً ممتعاً</span>
+      <span class="chip"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 6.2 6.6.7-4.9 4.5 1.3 6.5L12 17.7 6.1 20.5l1.3-6.5-4.9-4.5 6.6-.7z" fill="#ffd23f" stroke="#e0a92e" stroke-width="1.6" stroke-linejoin="round"/></svg>اجمعي النجوم الثلاث</span>
+    </div>
+    <button id="startBtn" class="start-btn">
+      <svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 6.2 6.6.7-4.9 4.5 1.3 6.5L12 17.7 6.1 20.5l1.3-6.5-4.9-4.5 6.6-.7z" fill="#fff" stroke="#b8860b" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      هيّا نبدأ الرحلة!
+      <svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 6.2 6.6.7-4.9 4.5 1.3 6.5L12 17.7 6.1 20.5l1.3-6.5-4.9-4.5 6.6-.7z" fill="#fff" stroke="#b8860b" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="best-pill" id="bestPillStart" style="display:none">أفضل نتيجة: <b id="bestValStart">0</b> نقطة</div>
+  </div>
+
+  <!-- المشهد السفلي: البنت تدفع اللوحة + الدبدوب -->
+  <div class="scene-bottom">
+    <div class="speech girl-bubble">شاهدني أدفع اللوحة بكل قوتي!</div>
+    <div class="speech teddy-b teddy-bubble">هيي! وأنا معي النفاخة!</div>
+
+    <!-- الدبدوب لونا -->
+    <div class="teddy-spot">
+      <svg id="teddyStart" class="teddy-svg mood-idle" viewBox="0 0 248 252" role="img" aria-label="الدبدوب لونا الوردي مع النفاخة">
+        <g class="teddy-all">
+          <ellipse cx="74" cy="228" rx="17" ry="11" fill="#f7a8c8"/>
+          <ellipse cx="146" cy="228" rx="17" ry="11" fill="#f7a8c8"/>
+          <ellipse cx="74" cy="229" rx="8" ry="5" fill="#ffd9e8"/>
+          <ellipse cx="146" cy="229" rx="8" ry="5" fill="#ffd9e8"/>
+          <ellipse cx="110" cy="182" rx="54" ry="46" fill="#f7a8c8"/>
+          <ellipse cx="110" cy="188" rx="30" ry="26" fill="#ffd9e8"/>
+          <ellipse cx="57" cy="176" rx="13" ry="24" fill="#f7a8c8" transform="rotate(18 57 176)"/>
+          <rect x="156" y="104" width="17" height="56" rx="8.5" fill="#f7a8c8" transform="rotate(-32 164 158)"/>
+          <circle cx="192" cy="108" r="11" fill="#f7a8c8"/>
+          <g class="horn-group" transform="translate(194,104) rotate(-60)">
+            <g class="horn-tongue">
+              <path d="M11 0 L20 -6 L28 6 L38 -6 L48 6 L58 -5 L68 5 L78 -4" fill="none" stroke="#ff5fa2" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11 0 L20 -6 L28 6 L38 -6 L48 6 L58 -5 L68 5 L78 -4" fill="none" stroke="#ffe3ee" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 10"/>
+              <circle cx="86" cy="-4" r="8.5" fill="#ffd23f" stroke="#e0a92e" stroke-width="2"/>
+              <circle cx="86" cy="-4" r="3" fill="#e0a92e"/>
+            </g>
+            <rect x="0" y="-6" width="17" height="12" rx="5" fill="#ffc94d" stroke="#e0a92e" stroke-width="2"/>
+            <circle cx="2.5" cy="0" r="3" fill="#e0a92e"/>
+          </g>
+          <circle cx="75" cy="45" r="15" fill="#f7a8c8"/>
+          <circle cx="145" cy="45" r="15" fill="#f7a8c8"/>
+          <circle cx="75" cy="45" r="7.5" fill="#ffd9e8"/>
+          <circle cx="145" cy="45" r="7.5" fill="#ffd9e8"/>
+          <circle cx="110" cy="82" r="46" fill="#f7a8c8"/>
+          <ellipse cx="110" cy="97" rx="17" ry="13" fill="#ffd9e8"/>
+          <ellipse cx="110" cy="90.5" rx="6.4" ry="4.8" fill="#c9487b"/>
+          <g class="eyes eyes-open">
+            <ellipse cx="90" cy="74" rx="5" ry="6" fill="#33211f"/>
+            <ellipse cx="130" cy="74" rx="5" ry="6" fill="#33211f"/>
+            <circle cx="91.6" cy="72" r="1.6" fill="#fff"/>
+            <circle cx="131.6" cy="72" r="1.6" fill="#fff"/>
+          </g>
+          <g class="eyes eyes-happy">
+            <path d="M83 75 q7 -8 14 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <path d="M123 75 q7 -8 14 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </g>
+          <g class="eyes eyes-sad">
+            <ellipse cx="90" cy="76" rx="4.6" ry="5.4" fill="#33211f"/>
+            <ellipse cx="130" cy="76" rx="4.6" ry="5.4" fill="#33211f"/>
+            <path d="M82 66 l13 4" stroke="#33211f" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M138 66 l-13 4" stroke="#33211f" stroke-width="2.4" stroke-linecap="round"/>
+          </g>
+          <g class="mouth mouth-idle">
+            <path d="M110 96 v6" stroke="#a34a72" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M110 102 q-7 7 -14 1 M110 102 q7 7 14 1" stroke="#a34a72" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          </g>
+          <g class="mouth mouth-happy">
+            <path d="M91 99 Q110 124 129 99 Q110 133 91 99 Z" fill="#8f3a5c"/>
+            <ellipse cx="110" cy="112" rx="9" ry="5.4" fill="#ff8fa8"/>
+          </g>
+          <g class="mouth mouth-sad">
+            <path d="M96 112 Q110 101 124 112" stroke="#a34a72" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </g>
+          <ellipse cx="74" cy="93" rx="5" ry="3.2" fill="#ff8fb0" opacity=".85"/>
+          <ellipse cx="146" cy="93" rx="5" ry="3.2" fill="#ff8fb0" opacity=".85"/>
+          <g transform="translate(110,33)"><path d="M0 0 L-11 -7.5 L-11 7.5 Z" fill="#ff5fa2" stroke="#d6336c" stroke-width="1.6" stroke-linejoin="round"/><path d="M0 0 L11 -7.5 L11 7.5 Z" fill="#ff5fa2" stroke="#d6336c" stroke-width="1.6" stroke-linejoin="round"/><circle r="4.2" fill="#d6336c"/></g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- مجموعة الدفع: اللوحة + البنت -->
+    <div class="push-group" id="pushGroup">
+      <div class="big-sign">
+        <div class="sign-board">
+          <div class="sign-badge">الفصل الأول</div>
+          <svg class="sign-book" viewBox="0 0 64 44" aria-hidden="true">
+            <path d="M32 10c-5-4.4-13-5.4-24-5.4v32c11 0 19 1 24 5.4 5-4.4 13-5.4 24-5.4v-32c-11 0-19 1-24 5.4z" fill="#fff" stroke="#e8438f" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M32 10v32" stroke="#e8438f" stroke-width="3"/>
+            <path d="M14 12h12M14 19h12M14 26h12M38 12h12M38 19h12M38 26h12" stroke="#ffb3d2" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+          <div class="sign-title">اجتماعيات</div>
+          <div class="sign-sub">للصف الخامس الابتدائي</div>
+        </div>
+        <div class="sign-legs"><div class="leg"></div><div class="leg"></div></div>
+        <div class="wheels">
+          <svg class="wheel" viewBox="0 0 48 48"><g class="spokes"><circle cx="24" cy="24" r="19" fill="#4a3b32" stroke="#2e241e" stroke-width="4"/><path d="M24 7v34M7 24h34M12 12l24 24M36 12L12 36" stroke="#ffd23f" stroke-width="4.5"/><circle cx="24" cy="24" r="7" fill="#ffd23f" stroke="#c8860a" stroke-width="2.5"/></g></svg>
+          <svg class="wheel" viewBox="0 0 48 48"><g class="spokes"><circle cx="24" cy="24" r="19" fill="#4a3b32" stroke="#2e241e" stroke-width="4"/><path d="M24 7v34M7 24h34M12 12l24 24M36 12L12 36" stroke="#ffd23f" stroke-width="4.5"/><circle cx="24" cy="24" r="7" fill="#ffd23f" stroke="#c8860a" stroke-width="2.5"/></g></svg>
+        </div>
+      </div>
+      <div class="girl-spot">
+        <svg class="girl-svg" viewBox="0 0 240 300" role="img" aria-label="لولو البنت الصغيرة تدفع اللوحة">
+          <g class="girl-all">
+            <rect x="128" y="238" width="13" height="30" rx="6.5" fill="#ffdcbb"/>
+            <rect x="90" y="240" width="13" height="30" rx="6.5" fill="#ffdcbb"/>
+            <rect x="122" y="262" width="30" height="12" rx="6" fill="#ff5b5b"/>
+            <rect x="80" y="264" width="30" height="12" rx="6" fill="#ff5b5b"/>
+            <rect x="122" y="270" width="30" height="4" rx="2" fill="#fff" opacity=".85"/>
+            <rect x="80" y="272" width="30" height="4" rx="2" fill="#fff" opacity=".85"/>
+            <rect x="34" y="150" width="92" height="15" rx="7.5" fill="#f2c49d"/>
+            <circle cx="38" cy="157" r="9.5" fill="#f2c49d"/>
+            <path d="M84 148 h52 q6 24 16 38 l8 48 q-52 15 -100 0 l8 -48 q10 -14 16 -38 z" fill="#ff5fa2"/>
+            <circle cx="110" cy="165" r="4.2" fill="#fff" opacity=".95"/>
+            <circle cx="97" cy="191" r="4.6" fill="#fff" opacity=".95"/>
+            <circle cx="124" cy="191" r="4.6" fill="#fff" opacity=".95"/>
+            <circle cx="110" cy="212" r="4.6" fill="#fff" opacity=".95"/>
+            <circle cx="87" cy="222" r="4" fill="#fff" opacity=".9"/>
+            <circle cx="133" cy="222" r="4" fill="#fff" opacity=".9"/>
+            <ellipse cx="110" cy="149" rx="17" ry="5.5" fill="#ffffff"/>
+            <rect x="36" y="176" width="92" height="15" rx="7.5" fill="#ffdcbb" transform="rotate(-4 126 183)"/>
+            <circle cx="40" cy="183" r="9.5" fill="#ffdcbb"/>
+            <circle cx="122" cy="152" r="11" fill="#ff5fa2"/>
+            <circle cx="124" cy="179" r="11" fill="#ff5fa2"/>
+            <rect x="103" y="130" width="14" height="14" rx="5" fill="#ffdcbb"/>
+            <circle cx="66" cy="94" r="15" fill="#46281f"/>
+            <circle cx="154" cy="94" r="15" fill="#46281f"/>
+            <circle cx="110" cy="86" r="41" fill="#46281f"/>
+            <g transform="translate(64,78)"><path d="M0 0 L-13 -9 L-13 9 Z" fill="#ff8fb8"/><path d="M0 0 L13 -9 L13 9 Z" fill="#ff8fb8"/><circle r="4.6" fill="#e8438f"/></g>
+            <g transform="translate(156,78)"><path d="M0 0 L-13 -9 L-13 9 Z" fill="#ff8fb8"/><path d="M0 0 L13 -9 L13 9 Z" fill="#ff8fb8"/><circle r="4.6" fill="#e8438f"/></g>
+            <circle cx="110" cy="93" r="33" fill="#ffdcbb"/>
+            <path d="M77 88 Q83 64 100 78 Q108 60 124 75 Q140 62 143 88 Q112 99 77 88 Z" fill="#46281f"/>
+            <path d="M88 91 q7 -5 14 0" stroke="#46281f" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M118 91 q7 -5 14 0" stroke="#46281f" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="95" cy="102" rx="4.8" ry="6" fill="#33211f"/>
+            <ellipse cx="125" cy="102" rx="4.8" ry="6" fill="#33211f"/>
+            <circle cx="96.6" cy="100" r="1.6" fill="#fff"/>
+            <circle cx="126.6" cy="100" r="1.6" fill="#fff"/>
+            <ellipse cx="85" cy="113" rx="5" ry="3" fill="#ff9eb3" opacity=".85"/>
+            <ellipse cx="135" cy="113" rx="5" ry="3" fill="#ff9eb3" opacity=".85"/>
+            <path d="M99 117 Q110 125 121 117" stroke="#7a3b32" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <g transform="translate(110,47) scale(.9)"><path d="M0 0 L-12 -8 L-12 8 Z" fill="#ffd23f"/><path d="M0 0 L12 -8 L12 8 Z" fill="#ffd23f"/><circle r="4.4" fill="#e0a92e"/></g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ شاشة الأسئلة ══════════════ -->
+<section id="quizScreen" class="screen quiz-screen hidden">
+  <div class="pink-world"></div>
+  <div class="bow-layer bows-on" id="bowsQuiz"></div>
+
+  <!-- جيرلاند الفيونكات والأعلام -->
+  <svg class="bunting" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 18 Q600 108 1200 18" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-opacity=".95"/>
+    <polygon points="83,33 117,33 100,68" fill="#ffd23f"/>
+    <polygon points="183,41 217,41 200,76" fill="#ff5fa2"/>
+    <polygon points="283,48 317,48 300,83" fill="#ffffff"/>
+    <polygon points="383,53 417,53 400,88" fill="#7be0ad"/>
+    <polygon points="483,56 517,56 500,91" fill="#c58bff"/>
+    <polygon points="583,57 617,57 600,92" fill="#ffd23f"/>
+    <polygon points="683,56 717,56 700,91" fill="#ff5fa2"/>
+    <polygon points="783,53 817,53 800,88" fill="#ffffff"/>
+    <polygon points="883,48 917,48 900,83" fill="#7be0ad"/>
+    <polygon points="983,41 1017,41 1000,76" fill="#c58bff"/>
+    <polygon points="1083,33 1117,33 1100,68" fill="#ffd23f"/>
+  </svg>
+
+  <div class="feedback-banner good" id="feedbackBanner">
+    <span id="feedbackText">ممتاز!</span>
+    <b class="gain-tag" id="gainTag">+100</b>
+  </div>
+
+  <div class="quiz-wrap">
+    <!-- الشريط العلوي -->
+    <div class="topbar">
+      <div class="pill stat-pill" id="scorePill" title="النتيجة">
+        <svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 6.2 6.6.7-4.9 4.5 1.3 6.5L12 17.7 6.1 20.5l1.3-6.5-4.9-4.5 6.6-.7z" fill="#ffd23f" stroke="#e0a92e" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span id="scoreVal">0</span>
+      </div>
+      <div class="progress-box">
+        <div class="progress-label">السؤال <b id="qNum">1</b> من <b id="qTotal">12</b></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="pill hearts-pill" id="heartsBox" title="المحاولات">
+        <svg class="heart-svg" viewBox="0 0 24 24"><path class="heart-path" d="M12 20.3s-8.4-5.2-11-10.2C-.4 6.6 2.4 3 6.6 3c2.4 0 4 1.3 5.4 3.4C13.4 4.3 15 3 17.4 3c4.2 0 7 3.6 5.6 7.1-2.6 5-11 10.2-11 10.2z"/></svg>
+        <svg class="heart-svg" viewBox="0 0 24 24"><path class="heart-path" d="M12 20.3s-8.4-5.2-11-10.2C-.4 6.6 2.4 3 6.6 3c2.4 0 4 1.3 5.4 3.4C13.4 4.3 15 3 17.4 3c4.2 0 7 3.6 5.6 7.1-2.6 5-11 10.2-11 10.2z"/></svg>
+        <svg class="heart-svg" viewBox="0 0 24 24"><path class="heart-path" d="M12 20.3s-8.4-5.2-11-10.2C-.4 6.6 2.4 3 6.6 3c2.4 0 4 1.3 5.4 3.4C13.4 4.3 15 3 17.4 3c4.2 0 7 3.6 5.6 7.1-2.6 5-11 10.2-11 10.2z"/></svg>
+      </div>
+    </div>
+
+    <!-- المسرح -->
+    <div class="stage">
+      <div class="side-char girl-side">
+        <svg id="girlQuiz" class="girl-svg" viewBox="0 0 240 300" role="img" aria-label="لولو تشجعك">
+          <g class="girl-all">
+            <rect x="128" y="238" width="13" height="30" rx="6.5" fill="#ffdcbb"/>
+            <rect x="90" y="240" width="13" height="30" rx="6.5" fill="#ffdcbb"/>
+            <rect x="122" y="262" width="30" height="12" rx="6" fill="#ff5b5b"/>
+            <rect x="80" y="264" width="30" height="12" rx="6" fill="#ff5b5b"/>
+            <rect x="122" y="270" width="30" height="4" rx="2" fill="#fff" opacity=".85"/>
+            <rect x="80" y="272" width="30" height="4" rx="2" fill="#fff" opacity=".85"/>
+            <rect x="34" y="150" width="92" height="15" rx="7.5" fill="#f2c49d"/>
+            <circle cx="38" cy="157" r="9.5" fill="#f2c49d"/>
+            <path d="M84 148 h52 q6 24 16 38 l8 48 q-52 15 -100 0 l8 -48 q10 -14 16 -38 z" fill="#ff5fa2"/>
+            <circle cx="110" cy="165" r="4.2" fill="#fff" opacity=".95"/>
+            <circle cx="97" cy="191" r="4.6" fill="#fff" opacity=".95"/>
+            <circle cx="124" cy="191" r="4.6" fill="#fff" opacity=".95"/>
+            <circle cx="110" cy="212" r="4.6" fill="#fff" opacity=".95"/>
+            <circle cx="87" cy="222" r="4" fill="#fff" opacity=".9"/>
+            <circle cx="133" cy="222" r="4" fill="#fff" opacity=".9"/>
+            <ellipse cx="110" cy="149" rx="17" ry="5.5" fill="#ffffff"/>
+            <rect x="36" y="176" width="92" height="15" rx="7.5" fill="#ffdcbb" transform="rotate(-4 126 183)"/>
+            <circle cx="40" cy="183" r="9.5" fill="#ffdcbb"/>
+            <circle cx="122" cy="152" r="11" fill="#ff5fa2"/>
+            <circle cx="124" cy="179" r="11" fill="#ff5fa2"/>
+            <rect x="103" y="130" width="14" height="14" rx="5" fill="#ffdcbb"/>
+            <circle cx="66" cy="94" r="15" fill="#46281f"/>
+            <circle cx="154" cy="94" r="15" fill="#46281f"/>
+            <circle cx="110" cy="86" r="41" fill="#46281f"/>
+            <g transform="translate(64,78)"><path d="M0 0 L-13 -9 L-13 9 Z" fill="#ff8fb8"/><path d="M0 0 L13 -9 L13 9 Z" fill="#ff8fb8"/><circle r="4.6" fill="#e8438f"/></g>
+            <g transform="translate(156,78)"><path d="M0 0 L-13 -9 L-13 9 Z" fill="#ff8fb8"/><path d="M0 0 L13 -9 L13 9 Z" fill="#ff8fb8"/><circle r="4.6" fill="#e8438f"/></g>
+            <circle cx="110" cy="93" r="33" fill="#ffdcbb"/>
+            <path d="M77 88 Q83 64 100 78 Q108 60 124 75 Q140 62 143 88 Q112 99 77 88 Z" fill="#46281f"/>
+            <path d="M88 91 q7 -5 14 0" stroke="#46281f" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M118 91 q7 -5 14 0" stroke="#46281f" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="95" cy="102" rx="4.8" ry="6" fill="#33211f"/>
+            <ellipse cx="125" cy="102" rx="4.8" ry="6" fill="#33211f"/>
+            <circle cx="96.6" cy="100" r="1.6" fill="#fff"/>
+            <circle cx="126.6" cy="100" r="1.6" fill="#fff"/>
+            <ellipse cx="85" cy="113" rx="5" ry="3" fill="#ff9eb3" opacity=".85"/>
+            <ellipse cx="135" cy="113" rx="5" ry="3" fill="#ff9eb3" opacity=".85"/>
+            <path d="M99 117 Q110 125 121 117" stroke="#7a3b32" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <g transform="translate(110,47) scale(.9)"><path d="M0 0 L-12 -8 L-12 8 Z" fill="#ffd23f"/><path d="M0 0 L12 -8 L12 8 Z" fill="#ffd23f"/><circle r="4.4" fill="#e0a92e"/></g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="question-card" id="questionCard">
+        <svg class="card-bow card-bow-r" viewBox="0 0 120 96" aria-hidden="true"><path d="M52 44 34 88 54 74 60 92 66 74 86 88 68 44Z" fill="#d6336c"/><path d="M56 40C34 8 6 16 9 44 6 70 36 72 57 47Z" fill="#ff5fa2" stroke="#fff" stroke-width="4" stroke-opacity=".9"/><path d="M64 40C86 8 114 16 111 44 114 70 84 72 63 47Z" fill="#ff5fa2" stroke="#fff" stroke-width="4" stroke-opacity=".9"/><circle cx="60" cy="44" r="9.5" fill="#d6336c" stroke="#fff" stroke-width="3"/></svg>
+        <svg class="card-bow card-bow-l" viewBox="0 0 120 96" aria-hidden="true"><path d="M52 44 34 88 54 74 60 92 66 74 86 88 68 44Z" fill="#e0a92e"/><path d="M56 40C34 8 6 16 9 44 6 70 36 72 57 47Z" fill="#ffd23f" stroke="#fff" stroke-width="4" stroke-opacity=".9"/><path d="M64 40C86 8 114 16 111 44 114 70 84 72 63 47Z" fill="#ffd23f" stroke="#fff" stroke-width="4" stroke-opacity=".9"/><circle cx="60" cy="44" r="9.5" fill="#e0a92e" stroke="#fff" stroke-width="3"/></svg>
+        <div class="q-ribbon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="2"/><path d="M3.5 12h17M12 3c-2.8 2.6-4.2 5.7-4.2 9S9.2 18.4 12 21c2.8-2.6 4.2-5.7 4.2-9S14.8 5.6 12 3z" stroke="#fff" stroke-width="1.8"/></svg>
+          اجتماعيات
+        </div>
+        <div class="q-text" id="qText">جاري تحميل السؤال...</div>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+      </div>
+
+      <div class="side-char teddy-side">
+        <div class="teddy-react" id="teddyReact">
+          <svg id="teddyQuiz" class="teddy-svg mood-idle" viewBox="0 0 248 252" role="img" aria-label="الدبدوب لونا يتفاعل معك">
+            <g class="teddy-all">
+              <ellipse cx="74" cy="228" rx="17" ry="11" fill="#f7a8c8"/>
+              <ellipse cx="146" cy="228" rx="17" ry="11" fill="#f7a8c8"/>
+              <ellipse cx="74" cy="229" rx="8" ry="5" fill="#ffd9e8"/>
+              <ellipse cx="146" cy="229" rx="8" ry="5" fill="#ffd9e8"/>
+              <ellipse cx="110" cy="182" rx="54" ry="46" fill="#f7a8c8"/>
+              <ellipse cx="110" cy="188" rx="30" ry="26" fill="#ffd9e8"/>
+              <ellipse cx="57" cy="176" rx="13" ry="24" fill="#f7a8c8" transform="rotate(18 57 176)"/>
+              <rect x="156" y="104" width="17" height="56" rx="8.5" fill="#f7a8c8" transform="rotate(-32 164 158)"/>
+              <circle cx="192" cy="108" r="11" fill="#f7a8c8"/>
+              <g class="horn-group" transform="translate(194,104) rotate(-60)">
+                <g class="horn-tongue">
+                  <path d="M11 0 L20 -6 L28 6 L38 -6 L48 6 L58 -5 L68 5 L78 -4" fill="none" stroke="#ff5fa2" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 0 L20 -6 L28 6 L38 -6 L48 6 L58 -5 L68 5 L78 -4" fill="none" stroke="#ffe3ee" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 10"/>
+                  <circle cx="86" cy="-4" r="8.5" fill="#ffd23f" stroke="#e0a92e" stroke-width="2"/>
+                  <circle cx="86" cy="-4" r="3" fill="#e0a92e"/>
+                </g>
+                <rect x="0" y="-6" width="17" height="12" rx="5" fill="#ffc94d" stroke="#e0a92e" stroke-width="2"/>
+                <circle cx="2.5" cy="0" r="3" fill="#e0a92e"/>
+              </g>
+              <circle cx="75" cy="45" r="15" fill="#f7a8c8"/>
+              <circle cx="145" cy="45" r="15" fill="#f7a8c8"/>
+              <circle cx="75" cy="45" r="7.5" fill="#ffd9e8"/>
+              <circle cx="145" cy="45" r="7.5" fill="#ffd9e8"/>
+              <circle cx="110" cy="82" r="46" fill="#f7a8c8"/>
+              <ellipse cx="110" cy="97" rx="17" ry="13" fill="#ffd9e8"/>
+              <ellipse cx="110" cy="90.5" rx="6.4" ry="4.8" fill="#c9487b"/>
+              <g class="eyes eyes-open">
+                <ellipse cx="90" cy="74" rx="5" ry="6" fill="#33211f"/>
+                <ellipse cx="130" cy="74" rx="5" ry="6" fill="#33211f"/>
+                <circle cx="91.6" cy="72" r="1.6" fill="#fff"/>
+                <circle cx="131.6" cy="72" r="1.6" fill="#fff"/>
+              </g>
+              <g class="eyes eyes-happy">
+                <path d="M83 75 q7 -8 14 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                <path d="M123 75 q7 -8 14 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+              </g>
+              <g class="eyes eyes-sad">
+                <ellipse cx="90" cy="76" rx="4.6" ry="5.4" fill="#33211f"/>
+                <ellipse cx="130" cy="76" rx="4.6" ry="5.4" fill="#33211f"/>
+                <path d="M82 66 l13 4" stroke="#33211f" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="M138 66 l-13 4" stroke="#33211f" stroke-width="2.4" stroke-linecap="round"/>
+              </g>
+              <g class="mouth mouth-idle">
+                <path d="M110 96 v6" stroke="#a34a72" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="M110 102 q-7 7 -14 1 M110 102 q7 7 14 1" stroke="#a34a72" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+              </g>
+              <g class="mouth mouth-happy">
+                <path d="M91 99 Q110 124 129 99 Q110 133 91 99 Z" fill="#8f3a5c"/>
+                <ellipse cx="110" cy="112" rx="9" ry="5.4" fill="#ff8fa8"/>
+              </g>
+              <g class="mouth mouth-sad">
+                <path d="M96 112 Q110 101 124 112" stroke="#a34a72" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+              </g>
+              <ellipse cx="74" cy="93" rx="5" ry="3.2" fill="#ff8fb0" opacity=".85"/>
+              <ellipse cx="146" cy="93" rx="5" ry="3.2" fill="#ff8fb0" opacity=".85"/>
+              <g transform="translate(110,33)"><path d="M0 0 L-11 -7.5 L-11 7.5 Z" fill="#ff5fa2" stroke="#d6336c" stroke-width="1.6" stroke-linejoin="round"/><path d="M0 0 L11 -7.5 L11 7.5 Z" fill="#ff5fa2" stroke="#d6336c" stroke-width="1.6" stroke-linejoin="round"/><circle r="4.2" fill="#d6336c"/></g>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- الخيارات -->
+    <div class="options-grid" id="optionsGrid"></div>
+
+    <!-- تلميح وكومبو -->
+    <div class="hint-row">
+      <button id="hintBtn" class="hint-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10.2 21h3.6M12 3a6.4 6.4 0 0 0-3.9 11.4c.8.7 1.2 1.4 1.2 2.6h5.4c0-1.2.4-1.9 1.2-2.6A6.4 6.4 0 0 0 12 3z" stroke="#d9930d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        تلميح
+        <span class="hint-count" id="hintCount">2</span>
+      </button>
+      <div class="combo-pill" id="comboPill">
+        <svg viewBox="0 0 24 24"><path d="M12 22c4.5 0 7.2-2.9 7.2-6.8 0-3-1.6-5.3-3.1-7.5-.9 1.4-2.2 2.1-3.1 4.1-1-.6-1.6-2.1-1.6-4.6C8.2 9.9 4.8 13 4.8 15.6 4.8 19.4 7.5 22 12 22z" fill="#fff"/></svg>
+        كومبو <span id="comboVal">x2</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ شاشة النهاية ══════════════ -->
+<section id="gameOverScreen" class="screen over-screen hidden">
+  <div class="pink-world"></div>
+  <div class="bow-layer bows-on" id="bowsOver"></div>
+  <svg class="bunting" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 18 Q600 108 1200 18" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-opacity=".95"/>
+    <polygon points="83,33 117,33 100,68" fill="#ff5fa2"/>
+    <polygon points="183,41 217,41 200,76" fill="#ffd23f"/>
+    <polygon points="283,48 317,48 300,83" fill="#7be0ad"/>
+    <polygon points="383,53 417,53 400,88" fill="#ffffff"/>
+    <polygon points="483,56 517,56 500,91" fill="#ff5fa2"/>
+    <polygon points="583,57 617,57 600,92" fill="#c58bff"/>
+    <polygon points="683,56 717,56 700,91" fill="#ffd23f"/>
+    <polygon points="783,53 817,53 800,88" fill="#ff5fa2"/>
+    <polygon points="883,48 917,48 900,83" fill="#ffffff"/>
+    <polygon points="983,41 1017,41 1000,76" fill="#7be0ad"/>
+    <polygon points="1083,33 1117,33 1100,68" fill="#c58bff"/>
+  </svg>
+
+  <div class="over-card">
+    <!-- الكأس -->
+    <svg class="over-trophy" viewBox="0 0 200 172" role="img" aria-label="كأس الفوز">
+      <defs>
+        <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffe680"/><stop offset=".5" stop-color="#ffd23f"/><stop offset="1" stop-color="#e0a92e"/>
+        </linearGradient>
+      </defs>
+      <path d="M54 36 H34a6 6 0 0 0-6 6v8a27 27 0 0 0 32 27" fill="none" stroke="#f0b429" stroke-width="9" stroke-linecap="round"/>
+      <path d="M146 36h20a6 6 0 0 1 6 6v8a27 27 0 0 1-32 27" fill="none" stroke="#f0b429" stroke-width="9" stroke-linecap="round"/>
+      <path d="M54 22h92v30a46 45 0 0 1-92 0Z" fill="url(#goldGrad)" stroke="#c8860a" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M100 33l5.2 10.8 11.8 1-8.9 8 2.5 11.6L100 60.5l-10.6 5.9 2.5-11.6-8.9-8 11.8-1z" fill="#fff" stroke="#c8860a" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="89" y="97" width="22" height="15" rx="3" fill="#e0a92e" stroke="#c8860a" stroke-width="2.5"/>
+      <rect x="70" y="112" width="60" height="13" rx="5.5" fill="#ffd94d" stroke="#c8860a" stroke-width="2.5"/>
+      <rect x="58" y="125" width="84" height="13" rx="5.5" fill="#e0a92e" stroke="#c8860a" stroke-width="2.5"/>
+      <path d="M40 14l2 4.6L46.6 20 42 22.6 44 27.4 40 24.8 36 27.4 38 22.6 33.4 20 38 18.4z" fill="#fff" opacity=".9"/>
+      <path d="M162 12l2 4.6 4.6 1.4-4.6 2.6 2 4.8-4.6-2.8-4.6 2.8 2-4.8-4.6-2.6 4.6-1.4z" fill="#fff" opacity=".9"/>
+    </svg>
+
+    <!-- الشخصيات تحتفل -->
+    <div class="corner-char corner-girl">
+      <svg class="girl-svg" viewBox="0 0 240 300"><g class="girl-all">
+        <rect x="128" y="238" width="13" height="30" rx="6.5" fill="#ffdcbb"/><rect x="90" y="240" width="13" height="30" rx="6.5" fill="#ffdcbb"/>
+        <rect x="122" y="262" width="30" height="12" rx="6" fill="#ff5b5b"/><rect x="80" y="264" width="30" height="12" rx="6" fill="#ff5b5b"/>
+        <rect x="34" y="150" width="92" height="15" rx="7.5" fill="#f2c49d"/><circle cx="38" cy="157" r="9.5" fill="#f2c49d"/>
+        <path d="M84 148 h52 q6 24 16 38 l8 48 q-52 15 -100 0 l8 -48 q10 -14 16 -38 z" fill="#ff5fa2"/>
+        <circle cx="110" cy="165" r="4.2" fill="#fff"/><circle cx="97" cy="191" r="4.6" fill="#fff"/><circle cx="124" cy="191" r="4.6" fill="#fff"/><circle cx="110" cy="212" r="4.6" fill="#fff"/>
+        <ellipse cx="110" cy="149" rx="17" ry="5.5" fill="#fff"/>
+        <rect x="36" y="176" width="92" height="15" rx="7.5" fill="#ffdcbb" transform="rotate(-4 126 183)"/><circle cx="40" cy="183" r="9.5" fill="#ffdcbb"/>
+        <circle cx="122" cy="152" r="11" fill="#ff5fa2"/><circle cx="124" cy="179" r="11" fill="#ff5fa2"/>
+        <rect x="103" y="130" width="14" height="14" rx="5" fill="#ffdcbb"/>
+        <circle cx="66" cy="94" r="15" fill="#46281f"/><circle cx="154" cy="94" r="15" fill="#46281f"/><circle cx="110" cy="86" r="41" fill="#46281f"/>
+        <g transform="translate(64,78)"><path d="M0 0 L-13 -9 L-13 9 Z" fill="#ff8fb8"/><path d="M0 0 L13 -9 L13 9 Z" fill="#ff8fb8"/><circle r="4.6" fill="#e8438f"/></g>
+        <g transform="translate(156,78)"><path d="M0 0 L-13 -9 L-13 9 Z" fill="#ff8fb8"/><path d="M0 0 L13 -9 L13 9 Z" fill="#ff8fb8"/><circle r="4.6" fill="#e8438f"/></g>
+        <circle cx="110" cy="93" r="33" fill="#ffdcbb"/>
+        <path d="M77 88 Q83 64 100 78 Q108 60 124 75 Q140 62 143 88 Q112 99 77 88 Z" fill="#46281f"/>
+        <path d="M86 100 q6 -7 12 0 M122 100 q6 -7 12 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="85" cy="113" rx="5" ry="3" fill="#ff9eb3" opacity=".85"/><ellipse cx="135" cy="113" rx="5" ry="3" fill="#ff9eb3" opacity=".85"/>
+        <path d="M97 114 Q110 128 123 114 Q110 133 97 114 Z" fill="#7a3230"/>
+        <g transform="translate(110,47) scale(.9)"><path d="M0 0 L-12 -8 L-12 8 Z" fill="#ffd23f"/><path d="M0 0 L12 -8 L12 8 Z" fill="#ffd23f"/><circle r="4.4" fill="#e0a92e"/></g>
+      </g></svg>
+    </div>
+    <div class="corner-char corner-teddy">
+      <svg class="teddy-svg mood-happy" viewBox="0 0 248 252"><g class="teddy-all">
+        <ellipse cx="74" cy="228" rx="17" ry="11" fill="#f7a8c8"/><ellipse cx="146" cy="228" rx="17" ry="11" fill="#f7a8c8"/>
+        <ellipse cx="110" cy="182" rx="54" ry="46" fill="#f7a8c8"/><ellipse cx="110" cy="188" rx="30" ry="26" fill="#ffd9e8"/>
+        <ellipse cx="57" cy="176" rx="13" ry="24" fill="#f7a8c8" transform="rotate(18 57 176)"/>
+        <rect x="156" y="104" width="17" height="56" rx="8.5" fill="#f7a8c8" transform="rotate(-32 164 158)"/><circle cx="192" cy="108" r="11" fill="#f7a8c8"/>
+        <circle cx="75" cy="45" r="15" fill="#f7a8c8"/><circle cx="145" cy="45" r="15" fill="#f7a8c8"/>
+        <circle cx="75" cy="45" r="7.5" fill="#ffd9e8"/><circle cx="145" cy="45" r="7.5" fill="#ffd9e8"/>
+        <circle cx="110" cy="82" r="46" fill="#f7a8c8"/>
+        <ellipse cx="110" cy="97" rx="17" ry="13" fill="#ffd9e8"/><ellipse cx="110" cy="90.5" rx="6.4" ry="4.8" fill="#c9487b"/>
+        <path d="M83 75 q7 -8 14 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M123 75 q7 -8 14 0" stroke="#33211f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M91 99 Q110 124 129 99 Q110 133 91 99 Z" fill="#8f3a5c"/>
+        <ellipse cx="110" cy="112" rx="9" ry="5.4" fill="#ff8fa8"/>
+        <ellipse cx="74" cy="93" rx="5" ry="3.2" fill="#ff8fb0" opacity=".85"/><ellipse cx="146" cy="93" rx="5" ry="3.2" fill="#ff8fb0" opacity=".85"/>
+        <g transform="translate(110,33)"><path d="M0 0 L-11 -7.5 L-11 7.5 Z" fill="#ff5fa2" stroke="#d6336c" stroke-width="1.6"/><path d="M0 0 L11 -7.5 L11 7.5 Z" fill="#ff5fa2" stroke="#d6336c" stroke-width="1.6"/><circle r="4.2" fill="#d6336c"/></g>
+      </g></svg>
+    </div>
+
+    <h2 class="over-title" id="overTitle">ما شاء الله!</h2>
+    <div class="stars-row" id="starsRow">
+      <span class="over-star"><svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l2.9 6.3 6.6.7-4.9 4.4 1.4 6.4L12 17.1 6 19.8l1.4-6.4-4.9-4.4 6.6-.7z"/></svg></span>
+      <span class="over-star"><svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l2.9 6.3 6.6.7-4.9 4.4 1.4 6.4L12 17.1 6 19.8l1.4-6.4-4.9-4.4 6.6-.7z"/></svg></span>
+      <span class="over-star"><svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l2.9 6.3 6.6.7-4.9 4.4 1.4 6.4L12 17.1 6 19.8l1.4-6.4-4.9-4.4 6.6-.7z"/></svg></span>
+    </div>
+    <p class="over-msg" id="overMsg">رائع!</p>
+
+    <div class="over-stats">
+      <div class="stat-row">
+        <span class="stat-label"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 6.2 6.6.7-4.9 4.5 1.3 6.5L12 17.7 6.1 20.5l1.3-6.5-4.9-4.5 6.6-.7z" fill="#ffd23f" stroke="#e0a92e" stroke-width="1.6" stroke-linejoin="round"/></svg>النتيجة النهائية</span>
+        <span class="val" id="finalScore">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16a34a" stroke-width="2.3"/><path d="M9 12.4l2.1 2.1 4-4.8" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>إجابات صحيحة</span>
+        <span class="val" id="finalCorrect">0 / 12</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label"><svg viewBox="0 0 24 24"><path d="M12 22c4.5 0 7.2-2.9 7.2-6.8 0-3-1.6-5.3-3.1-7.5-.9 1.4-2.2 2.1-3.1 4.1-1-.6-1.6-2.1-1.6-4.6C8.2 9.9 4.8 13 4.8 15.6 4.8 19.4 7.5 22 12 22z" fill="#fb8500"/></svg>أطول كومبو</span>
+        <span class="val" id="finalCombo">x0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label"><svg viewBox="0 0 24 24" fill="none"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="#b8860b" stroke-width="2.2" stroke-linejoin="round"/><path d="M7 5H4.5a2 2 0 0 0 2 4.5M17 5h2.5a2 2 0 0 1-2 4.5M12 13v3M9 20h6M10 16h4v3h-4z" stroke="#b8860b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>أفضل نتيجة</span>
+        <span class="val" id="bestScore">0</span>
+      </div>
+    </div>
+
+    <div class="over-btns">
+      <button id="playAgainBtn" class="btn btn-pink">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M3 4v5h5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        العب مرة أخرى
+      </button>
+      <button id="homeBtn" class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5M6.5 10v9h11v-9" stroke="#d6336c" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        القائمة الرئيسية
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+/* حالات مزاج الدبدوب */
+.eyes-happy,.eyes-sad,.mouth-happy,.mouth-sad{display:none}
+.mood-happy .eyes-open,.mood-happy .mouth-idle{display:none}
+.mood-happy .eyes-happy,.mood-happy .mouth-happy{display:inline}
+.mood-sad .eyes-open,.mood-sad .mouth-idle{display:none}
+.mood-sad .eyes-sad,.mood-sad .mouth-sad{display:inline}
+</style>
+
+<script>
+'use strict';
+/* ============================================================
+   اجتماعيات — الصف الخامس الابتدائي
+   رحلة لولو والدبدوب لونا عبر درس "موقع وطننا العراق"
+   ============================================================ */
+const $  = (s, p=document) => p.querySelector(s);
+const $$ = (s, p=document) => [...p.querySelectorAll(s)];
+const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+
+/* ============ محرك الصوت (Web Audio API) ============ */
+const Sound = (() => {
+  let ctx = null, muted = false;
+  const ac = () => {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  };
+  function tone(freq, delay=0, dur=0.2, type='sine', vol=0.25, slideTo=null){
+    if (muted) return; const c = ac(); if (!c) return;
+    const t = c.currentTime + delay;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(30, slideTo), t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.018);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  return {
+    unlock(){ ac(); },
+    toggleMute(){ muted = !muted; return muted; },
+    click(){ tone(700,0,.07,'triangle',.22); tone(1050,.05,.09,'triangle',.18); },
+    correct(){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,i*.09,.24,'triangle',.28)); },
+    wrong(){ tone(233,0,.28,'sawtooth',.16,180); tone(155,.22,.42,'sawtooth',.16,110); },
+    horn(){ [660,520,660,440].forEach((f,i)=>tone(f,i*.08,.1,'square',.15)); tone(880,.36,.2,'square',.13,660); },
+    heart(){ tone(196,0,.3,'sine',.32,90); },
+    tick(){ tone(1250,0,.045,'square',.1); },
+    hintS(){ tone(1318.5,0,.18,'sine',.22); tone(1568,.1,.24,'sine',.22); },
+    star(i){ tone(660 + i*220, 0, .3, 'triangle', .3); },
+    win(){ [523.25,587.33,659.25,783.99,1046.5,1318.5].forEach((f,i)=>tone(f,i*.13,.34,'triangle',.28)); },
+    lose(){ [392,329.6,261.6].forEach((f,i)=>tone(f,i*.22,.42,'sine',.24)); }
+  };
+})();
+document.addEventListener('pointerdown', () => Sound.unlock(), { once:true });
+
+/* ============ كانفاس الكونفيتي والفيونكات المتساقطة ============ */
+const fx = $('#fx'), fctx = fx.getContext('2d');
+let W = 0, H = 0, parts = [], fxRunning = false;
+function resizeFx(){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  fx.width = W*dpr; fx.height = H*dpr; fx.style.width = W+'px'; fx.style.height = H+'px';
+  fctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize', resizeFx); resizeFx();
+const CONF_COLORS = ['#ff5fa2','#ff8fb8','#ffd23f','#ffffff','#7be0ad','#c58bff','#ffb3d2','#ffe27a'];
+function spawnConfetti(n, originX, originY, spread, speed){
+  originX = originX ?? W/2; originY = originY ?? H*0.28; spread = spread ?? Math.PI*0.95; speed = speed ?? 9;
+  for (let i=0;i<n;i++){
+    const ang = -Math.PI/2 + (Math.random()-0.5)*spread;
+    const sp = speed*(0.4 + Math.random()*0.95);
+    parts.push({x:originX+(Math.random()-0.5)*70, y:originY, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp,
+      w:rand(6,12), h:rand(8,16), rot:rand(0,6.28), vr:rand(-.2,.2),
+      color:pick(CONF_COLORS), shape:pick(['rect','circle','bow','ribbon']), life:rand(75,130)});
+  }
+  runFx();
+}
+function rainConfetti(n){
+  n = n || 150;
+  for (let i=0;i<n;i++){
+    parts.push({x:rand(0,W), y:rand(-H*0.45,-20), vx:rand(-1.6,1.6), vy:rand(1.6,3.6),
+      w:rand(6,12), h:rand(8,16), rot:rand(0,6.28), vr:rand(-.15,.15),
+      color:pick(CONF_COLORS), shape:pick(['rect','circle','bow','ribbon']), life:rand(150,230)});
+  }
+  runFx();
+}
+function drawBowShape(c, p){
+  c.fillStyle = p.color;
+  c.beginPath(); c.moveTo(0,0); c.lineTo(-p.w,-p.h*0.62); c.lineTo(-p.w,p.h*0.62); c.closePath();
+  c.moveTo(0,0); c.lineTo(p.w,-p.h*0.62); c.lineTo(p.w,p.h*0.62); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(255,255,255,.9)';
+  c.beginPath(); c.arc(0,0,p.w*0.34,0,7); c.fill();
+}
+function runFx(){ if (fxRunning) return; fxRunning = true; requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  fctx.clearRect(0,0,W,H);
+  parts = parts.filter(p => p.life > 0 && p.y < H + 40);
+  for (const p of parts){
+    p.vy += 0.14; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    fctx.save(); fctx.translate(p.x, p.y); fctx.rotate(p.rot);
+    fctx.globalAlpha = Math.max(0, Math.min(1, p.life/40));
+    if (p.shape === 'rect'){ fctx.fillStyle = p.color; fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); }
+    else if (p.shape === 'circle'){ fctx.fillStyle = p.color; fctx.beginPath(); fctx.arc(0,0,p.w/1.6,0,7); fctx.fill(); }
+    else if (p.shape === 'ribbon'){ fctx.fillStyle = p.color; fctx.fillRect(-p.w/6,-p.h,p.w/3,p.h*2); }
+    else drawBowShape(fctx, p);
+    fctx.restore();
+  }
+  if (parts.length){ requestAnimationFrame(fxLoop); }
+  else { fxRunning = false; fctx.clearRect(0,0,W,H); }
+}
+
+/* ============ زرع الفيونكات الزخرفية ============ */
+const BOW_SPOTS = [
+  [2,2,64,-18],[3,89,80,14],[20,1,52,10],[22,94,56,-12],
+  [42,0,70,-6],[44,96,66,8],[64,2,56,16],[66,94,62,-14],
+  [85,5,74,-8],[86,89,72,10],[6,31,42,22],[6,65,42,-22]
+];
+const BOW_COLORS = [
+  ['#ff5fa2','#d6336c'],['#ffd23f','#e0a92e'],['#ffffff','#f0b9d2'],
+  ['#c58bff','#9d63e0'],['#7be0ad','#46b57a'],['#ffb3d2','#e87ba8']
+];
+function bowSVG(main, dark){
+  return '<svg viewBox="0 0 120 96"><path d="M52 44 34 88 54 74 60 92 66 74 86 88 68 44Z" fill="'+dark+'"/>'
+    +'<path d="M56 40C34 8 6 16 9 44 6 70 36 72 57 47Z" fill="'+main+'" stroke="#fff" stroke-width="4" stroke-opacity=".88" stroke-linejoin="round"/>'
+    +'<path d="M64 40C86 8 114 16 111 44 114 70 84 72 63 47Z" fill="'+main+'" stroke="#fff" stroke-width="4" stroke-opacity=".88" stroke-linejoin="round"/>'
+    +'<circle cx="60" cy="44" r="9.5" fill="'+dark+'" stroke="#fff" stroke-width="3" stroke-opacity=".9"/></svg>';
+}
+function plantBows(id){
+  const layer = document.getElementById(id); if (!layer) return;
+  BOW_SPOTS.forEach((s, i) => {
+    const t = s[0], l = s[1], size = s[2], r = s[3];
+    const cols = BOW_COLORS[i % BOW_COLORS.length];
+    const sp = document.createElement('span');
+    sp.className = 'deco-bow';
+    sp.style.cssText = 'top:'+t+'%;left:'+l+'%;width:'+size+'px;--r:'+r+'deg;transition-delay:'+(i*75)+'ms';
+    sp.innerHTML = '<span class="bow-float" style="animation-delay:'+(-i*0.66)+'s">'+bowSVG(cols[0], cols[1])+'</span>';
+    layer.appendChild(sp);
+  });
+}
+plantBows('bowsStart'); plantBows('bowsQuiz'); plantBows('bowsOver');
+
+/* ============ بنك الأسئلة (من محتوى الكتاب) ============ */
+const BANK = [
+  { q:'في أي قارة يقع وطننا العراق؟', o:['قارة آسيا','قارة أفريقيا','قارة أوروبا','قارة أمريكا الجنوبية'], a:0 },
+  { q:'يقع وطننا العراق في الجزء ........... من قارة آسيا؟', o:['الجنوبي الغربي','الشمالي الشرقي','الشمالي الغربي','الجنوبي الشرقي'], a:0 },
+  { q:'يقع العراق في قلب العالم ويعد حلقة الوصل بين قارات ...؟', o:['آسيا وأفريقيا وأوروبا','آسيا وأمريكا وأستراليا','أفريقيا وأوروبا وأمريكا','أوروبا وأمريكا وأستراليا'], a:0 },
+  { q:'يحد وطننا العراق من جهة الشمال دولة ...؟', o:['تركيا','إيران','سوريا','السعودية'], a:0 },
+  { q:'يحد وطننا العراق من جهة الشرق ...؟', o:['إيران','تركيا','الكويت','الأردن'], a:0 },
+  { q:'يحد وطننا العراق من جهة الغرب ...؟', o:['سوريا والأردن','تركيا وإيران','الكويت والسعودية','لبنان ومصر'], a:0 },
+  { q:'يحد العراق من جهة الجنوب ...؟', o:['الخليج العربي والكويت والسعودية','تركيا وسوريا','إيران والأردن','سوريا ولبنان'], a:0 },
+  { q:'ما أهمية موقع العراق قديماً وحديثاً؟', o:['معبر لطرق النقل والتجارة الدولية','أكبر دولة في العالم','أبعد دولة عن العالم','دولة بلا حدود مع أحد'], a:0 },
+  { q:'العراق احد الدول العربية ويحتل الجزء ........... منها؟', o:['الشمالي الشرقي','الجنوبي الغربي','الشمالي الغربي','الجنوبي الشرقي'], a:0 },
+  { q:'كم عدد محافظات وطننا العراق؟', o:['18 محافظة','15 محافظة','20 محافظة','12 محافظة'], a:0 },
+  { q:'ما هي أصغر وحدة في التنظيم الإداري بالعراق؟', o:['الناحية','القضاء','المحافظة','القرية'], a:0 },
+  { q:'ما هي أكبر وحدة في التنظيم الإداري بالعراق؟', o:['المحافظة','القضاء','الناحية','المدينة'], a:0 },
+  { q:'كل محافظة في العراق تتكون من ...؟', o:['أقضية ونواحي','محافظات صغيرة','قرى فقط','شوارع وأزقة'], a:0 },
+  { q:'عاصمة وطننا العراق هي ...؟', o:['بغداد','البصرة','الموصل','كربلاء المقدسة'], a:0 },
+  { q:'ما هو المنفذ البحري الذي يطل عليه العراق من جهة الجنوب؟', o:['الخليج العربي','البحر المتوسط','البحر الأحمر','بحر العرب'], a:0 },
+  { q:'الأقضية والنواحي مناطق إدارية صغيرة تتبع ...؟', o:['كل محافظة','العاصمة بغداد فقط','وزارة الدفاع','الخارج'], a:0 },
+  { q:'تختلف محافظات العراق من حيث ...؟', o:['موقعها الجغرافي ومساحتها وعدد سكانها','اللغة فقط','العملة فقط','العلم فقط'], a:0 },
+  { q:'المحافظة هي وحدة إدارية تتميز بـ ...؟', o:['خصائص جغرافية طبيعية وبشرية','أنها لا حدود لها','أنها بدون سكان','أنها أكبر من الدول'], a:0 },
+  { q:'شارع المتنبي من أشهر معالم مدينة ...؟', o:['بغداد','البصرة','دهوك','النجف الأشرف'], a:0 }
+];
+const TOTAL_Q = 12, TIME_PER_Q = 20;
+const LETTERS = ['أ','ب','ج','د'];
+
+/* ============ عناصر الشاشات ============ */
+const startScreen  = $('#startScreen');
+const quizScreen   = $('#quizScreen');
+const overScreen   = $('#gameOverScreen');
+const startBtn     = $('#startBtn');
+const teddyStart   = $('#teddyStart');
+const bestPillStart= $('#bestPillStart');
+const bestValStart = $('#bestValStart');
+
+const scoreVal    = $('#scoreVal');
+const scorePill   = $('#scorePill');
+const heartsBox   = $('#heartsBox');
+const heartEls    = $$('.heart-svg', heartsBox);
+const qNum        = $('#qNum');
+const qTotal      = $('#qTotal');
+const progressFill= $('#progressFill');
+const qText       = $('#qText');
+const timerFill   = $('#timerFill');
+const questionCard= $('#questionCard');
+const optionsGrid = $('#optionsGrid');
+const hintBtn     = $('#hintBtn');
+const hintCountEl = $('#hintCount');
+const comboPill   = $('#comboPill');
+const comboVal    = $('#comboVal');
+const feedbackBanner = $('#feedbackBanner');
+const feedbackText   = $('#feedbackText');
+const gainTag        = $('#gainTag');
+const teddyQuiz   = $('#teddyQuiz');
+const girlQuiz    = $('#girlQuiz');
+
+const overTitle   = $('#overTitle');
+const overMsg     = $('#overMsg');
+const starsWrap   = $('#starsRow');
+const starEls     = $$('.over-star', starsWrap);
+const finalScore  = $('#finalScore');
+const finalCorrect= $('#finalCorrect');
+const finalCombo  = $('#finalCombo');
+const bestScoreEl = $('#bestScore');
+const playAgainBtn= $('#playAgainBtn');
+const homeBtn     = $('#homeBtn');
+
+/* ============ حالة اللعبة ============ */
+let deck = [], idx = 0, score = 0, hearts = 3, correctCount = 0;
+let combo = 0, bestCombo = 0, locked = false, hintsLeft = 2;
+let timer = null, timeLeft = TIME_PER_Q, lastTick = 99;
+let best = 0;
+try { best = +(localStorage.getItem('social5th_best') || 0); } catch(e) { best = 0; }
+function refreshBestPill(){
+  if (best > 0){ bestPillStart.style.display = 'block'; bestValStart.textContent = best; }
+  else bestPillStart.style.display = 'none';
+}
+refreshBestPill();
+
+function buildDeck(){
+  deck = shuffle(BANK).slice(0, TOTAL_Q).map(item => {
+    const opts = shuffle(item.o.map((t, i) => ({ t: t, ok: i === item.a })));
+    return { q: item.q, opts: opts };
+  });
+}
+
+/* ============ تحديث الواجهة ============ */
+function updateHearts(){
+  heartEls.forEach((h, i) => h.classList.toggle('lost', i >= hearts));
+}
+function updateComboPill(){
+  if (combo >= 2){ comboVal.textContent = 'x' + combo; comboPill.classList.add('show'); }
+  else comboPill.classList.remove('show');
+}
+function teddyMood(m){
+  teddyQuiz.classList.remove('mood-idle','mood-happy','mood-sad');
+  teddyQuiz.classList.add('mood-' + m);
+  if (m === 'happy'){
+    teddyQuiz.classList.remove('blow','jump'); void teddyQuiz.getBoundingClientRect();
+    teddyQuiz.classList.add('blow','jump');
+    setTimeout(() => teddyQuiz.classList.remove('blow','jump'), 1100);
+  } else if (m === 'sad'){
+    teddyQuiz.classList.remove('jump');
+  }
+}
+function girlJump(){
+  girlQuiz.classList.remove('jump'); void girlQuiz.getBoundingClientRect();
+  girlQuiz.classList.add('jump');
+  setTimeout(() => girlQuiz.classList.remove('jump'), 720);
+}
+function showBanner(text, good, gain){
+  feedbackBanner.classList.remove('good','bad','show');
+  feedbackBanner.classList.add(good ? 'good' : 'bad');
+  feedbackText.textContent = text;
+  if (gain){ gainTag.textContent = '+' + gain; gainTag.style.display = 'inline-block'; }
+  else gainTag.style.display = 'none';
+  void feedbackBanner.offsetWidth;
+  feedbackBanner.classList.add('show');
+}
+function hideBanner(){ feedbackBanner.classList.remove('show'); }
+function popScore(gain){
+  scoreVal.textContent = score;
+  scorePill.classList.remove('bump'); void scorePill.offsetWidth; scorePill.classList.add('bump');
+  const r = scorePill.getBoundingClientRect();
+  const s = document.createElement('span');
+  s.className = 'float-gain'; s.textContent = '+' + gain;
+  s.style.left = (r.left + r.width/2) + 'px';
+  s.style.top  = (r.bottom + 8) + 'px';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 1200);
+}
+
+/* ============ المؤقّت ============ */
+function startTimer(){
+  clearInterval(timer);
+  timeLeft = TIME_PER_Q; lastTick = TIME_PER_Q + 1;
+  timerFill.style.width = '100%'; timerFill.classList.remove('low');
+  timer = setInterval(() => {
+    timeLeft -= 0.05;
+    if (timeLeft <= 0) timeLeft = 0;
+    timerFill.style.width = (timeLeft / TIME_PER_Q * 100) + '%';
+    if (timeLeft <= 5){
+      timerFill.classList.add('low');
+      const s = Math.ceil(timeLeft);
+      if (s !== lastTick && s > 0){ lastTick = s; Sound.tick(); }
+    }
+    if (timeLeft <= 0){ clearInterval(timer); timeUp(); }
+  }, 50);
+}
+function stopTimer(){ clearInterval(timer); }
+
+/* ============ عرض السؤال ============ */
+function renderQuestion(){
+  locked = false;
+  const item = deck[idx];
+  qText.textContent = item.q;
+  qNum.textContent = idx + 1;
+  qTotal.textContent = deck.length;
+  progressFill.style.width = (idx / deck.length * 100) + '%';
+  optionsGrid.innerHTML = '';
+  item.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'option-btn';
+    b.innerHTML =
+      '<span class="opt-letter">' + LETTERS[i] + '</span>' +
+      '<span class="opt-text">' + o.t + '</span>' +
+      '<span class="opt-state">' +
+        '<svg class="icon-check" viewBox="0 0 24 24"><path d="M4.5 12.8 9.6 17.9 19.5 6.4" fill="none" stroke="#16a34a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '<svg class="icon-cross" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="#e03131" stroke-width="3.4" stroke-linecap="round"/></svg>' +
+      '</span>';
+    b.addEventListener('click', () => choose(i, b));
+    optionsGrid.appendChild(b);
+  });
+  if (hintsLeft > 0) hintBtn.disabled = false;
+  teddyMood('idle');
+  hideBanner();
+  questionCard.classList.remove('pop'); void questionCard.offsetWidth; questionCard.classList.add('pop');
+  startTimer();
+}
+
+/* ============ اختيار إجابة ============ */
+function choose(i, btn){
+  if (locked) return;
+  locked = true; stopTimer();
+  const item = deck[idx];
+  const ok = item.opts[i].ok;
+  progressFill.style.width = ((idx + 1) / deck.length * 100) + '%';
+  [...optionsGrid.children].forEach((b, j) => {
+    b.classList.add('disabled');
+    if (item.opts[j].ok) b.classList.add('correct');
+  });
+  if (ok){
+    combo++; bestCombo = Math.max(bestCombo, combo); correctCount++;
+    const gain = 100 + (combo - 1) * 50;
+    score += gain;
+    btn.classList.add('correct');
+    popScore(gain);
+    Sound.correct();
+    setTimeout(() => Sound.horn(), 230);
+    spawnConfetti(75, W/2, H*0.3, Math.PI*1.15, 10);
+    teddyMood('happy'); girlJump();
+    showBanner(pick(['ممتاز!','رائع!','أحسنت!','عظيم!','يا لها من بطلة!']), true, gain);
+  } else {
+    combo = 0; hearts--;
+    updateHearts();
+    btn.classList.add('wrong');
+    Sound.wrong();
+    setTimeout(() => Sound.heart(), 160);
+    teddyMood('sad');
+    questionCard.classList.add('shake');
+    setTimeout(() => questionCard.classList.remove('shake'), 620);
+    const correctText = item.opts.find(o => o.ok).t;
+    showBanner('الإجابة الصحيحة: ' + correctText, false);
+  }
+  updateComboPill();
+  setTimeout(advance, 2050);
+}
+
+function timeUp(){
+  if (locked) return;
+  locked = true;
+  const item = deck[idx];
+  progressFill.style.width = ((idx + 1) / deck.length * 100) + '%';
+  [...optionsGrid.children].forEach((b, j) => {
+    b.classList.add('disabled');
+    if (item.opts[j].ok) b.classList.add('correct');
+  });
+  combo = 0; hearts--;
+  updateHearts(); updateComboPill();
+  Sound.wrong(); setTimeout(() => Sound.heart(), 160);
+  teddyMood('sad');
+  questionCard.classList.add('shake');
+  setTimeout(() => questionCard.classList.remove('shake'), 620);
+  const correctText = item.opts.find(o => o.ok).t;
+  showBanner('انتهى الوقت! الإجابة: ' + correctText, false);
+  setTimeout(advance, 2100);
+}
+
+function advance(){
+  hideBanner();
+  idx++;
+  if (hearts <= 0){ endGame(); return; }
+  if (idx >= deck.length){ endGame(); return; }
+  renderQuestion();
+}
+
+/* ============ بدء اللعبة ============ */
+function startQuiz(){
+  buildDeck();
+  idx = 0; score = 0; hearts = 3; correctCount = 0;
+  combo = 0; bestCombo = 0; hintsLeft = 2;
+  scoreVal.textContent = '0';
+  hintCountEl.textContent = hintsLeft;
+  hintBtn.disabled = false;
+  updateHearts(); updateComboPill();
+  renderQuestion();
+}
+
+/* ============ نهاية اللعبة ============ */
+function endGame(){
+  stopTimer(); hideBanner();
+  quizScreen.classList.add('hidden');
+  overScreen.classList.remove('hidden');
+
+  const total = deck.length;
+  const ratio = total ? correctCount / total : 0;
+  let stars;
+  if (hearts <= 0) stars = ratio >= 0.5 ? 1 : 0;
+  else stars = ratio >= 0.9 ? 3 : (ratio >= 0.65 ? 2 : 1);
+
+  let isNewBest = false;
+  if (score > best){
+    best = score; isNewBest = true;
+    try { localStorage.setItem('social5th_best', String(best)); } catch(e) {}
+  }
+  refreshBestPill();
+
+  finalScore.textContent = score;
+  finalCorrect.textContent = correctCount + ' / ' + total;
+  finalCombo.textContent = 'x' + bestCombo;
+  bestScoreEl.textContent = best + (isNewBest ? ' (جديد!)' : '');
+
+  if (hearts <= 0){
+    overTitle.textContent = 'لا تيأسي أبداً!';
+    overMsg.textContent = 'كل بطلة تتعلم من أخطائها... راجعي درس موقع وطننا العراق والخرائط في الكتاب وحاولي مرة أخرى!';
+  } else if (stars === 3){
+    overTitle.textContent = 'ما شاء الله! نجمة الاجتماعيات!';
+    overMsg.textContent = 'مذهلة! حفظتِ موقع وطننا العراق وأهميته ومحافظاته الثماني عشرة عن ظهر قلب!';
+  } else if (stars === 2){
+    overTitle.textContent = 'رائع جداً يا لولو!';
+    overMsg.textContent = 'أداء متميز! أنتِ تعرفين وطننا معرفة جميلة... خطوة واحدة وتصلين إلى القمة!';
+  } else {
+    overTitle.textContent = 'أحسنتِ يا لولو!';
+    overMsg.textContent = 'بداية جميلة! راجعي الخرائط الثلاث في الكتاب: موقع العراق من العالم ومن الدول المجاورة والخريطة الإدارية.';
+  }
+
+  starEls.forEach(s => s.classList.remove('filled'));
+  for (let i = 0; i < stars; i++){
+    setTimeout(() => {
+      starEls[i].classList.add('filled');
+      Sound.star(i);
+      const r = starEls[i].getBoundingClientRect();
+      spawnConfetti(22, r.left + r.width/2, r.top, Math.PI*0.9, 6);
+    }, 450 + i * 430);
+  }
+  if (stars >= 2){ Sound.win(); setTimeout(() => rainConfetti(160), 500); }
+  else if (stars === 1){ Sound.click(); }
+  else Sound.lose();
+}
+
+/* ============ ربط الأحداث ============ */
+startBtn.addEventListener('click', () => {
+  Sound.unlock(); Sound.click();
+  setTimeout(() => Sound.horn(), 160);
+  startScreen.classList.add('pushing');
+  teddyStart.classList.add('blow');
+  setTimeout(() => teddyStart.classList.remove('blow'), 1350);
+  setTimeout(() => {
+    startScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+    startQuiz();
+  }, 1780);
+});
+
+hintBtn.addEventListener('click', () => {
+  if (hintsLeft <= 0 || locked) return;
+  Sound.hintS();
+  const item = deck[idx];
+  const wrongBtns = [...optionsGrid.children].filter((b, j) => !item.opts[j].ok && !b.classList.contains('hint-out'));
+  shuffle(wrongBtns).slice(0, 2).forEach(b => b.classList.add('hint-out'));
+  hintsLeft--;
+  hintCountEl.textContent = hintsLeft;
+  if (hintsLeft === 0) hintBtn.disabled = true;
+  const r = hintBtn.getBoundingClientRect();
+  spawnConfetti(16, r.left + r.width/2, r.top, Math.PI*2, 4.5);
+});
+
+playAgainBtn.addEventListener('click', () => {
+  Sound.click();
+  overScreen.classList.add('hidden');
+  quizScreen.classList.remove('hidden');
+  startQuiz();
+});
+
+homeBtn.addEventListener('click', () => {
+  Sound.click();
+  overScreen.classList.add('hidden');
+  startScreen.classList.remove('pushing');
+  teddyStart.classList.remove('blow');
+  startScreen.classList.remove('hidden');
+  refreshBestPill();
+});
+
+const muteBtn = $('#muteBtn');
+muteBtn.addEventListener('click', () => {
+  const muted = Sound.toggleMute();
+  muteBtn.classList.toggle('muted', muted);
+  if (!muted) Sound.click();
+});
+</script>
+</body>
+</html>
